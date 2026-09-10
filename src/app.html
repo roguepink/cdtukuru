@@ -1,0 +1,921 @@
+<title>七枚の同じ歌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=DotGothic16&family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* ============================================================
+   七枚の同じ歌 — prototype v0.1
+   暗い部屋のミニコンポ。単一テーマ（ダーク）に意図的に固定。
+   ============================================================ */
+:root{
+  --room-0:#0C0D10;      /* 部屋の闇 */
+  --room-1:#15171C;      /* 家具の影 */
+  --room-2:#1E2128;      /* 立ち上がり面 */
+  --panel-hi:#D3CBB9;    /* アルミ前面のハイライト */
+  --panel:#A79F8F;       /* シャンパンアルミ */
+  --panel-lo:#6B6559;    /* 削り面の影 */
+  --plastic:#D8CEB9;     /* TV筐体のベージュ樹脂 */
+  --plastic-lo:#9E9179;
+  --vfd:#7CF2C8;         /* 蛍光表示管 */
+  --vfd-dim:#2C6555;
+  --signal:#E2503A;      /* 電源 / REC の赤 */
+  --ink:#EAE5D9;
+  --ink-dim:#948E82;
+  --ink-faint:#5E594F;
+  --hair:rgba(232,227,217,.13);
+  --label:'Barlow Semi Condensed',"Zen Kaku Gothic New",system-ui,sans-serif;
+  --pixel:'DotGothic16',"Zen Kaku Gothic New",monospace;
+  --body:"Zen Kaku Gothic New",system-ui,-apple-system,sans-serif;
+  --serif:'Shippori Mincho',"Yu Mincho",serif;
+  --r-sm:3px; --r-md:7px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--room-0); color:var(--ink);
+  font-family:var(--body); font-size:15px; line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+  background-image:
+    radial-gradient(120% 80% at 50% -10%, rgba(124,242,200,.055), transparent 60%),
+    radial-gradient(90% 60% at 50% 110%, rgba(226,80,58,.05), transparent 60%);
+  background-attachment:fixed;
+}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:2px solid var(--vfd); outline-offset:3px; border-radius:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- 部屋 ---------- */
+.room{
+  max-width:1080px; margin-inline:auto;
+  padding-inline:18px; padding-block:26px 56px;
+  display:grid; gap:26px;
+  grid-template-columns:minmax(0,1fr) 320px;
+  align-items:start;
+}
+.masthead{grid-column:1/-1; display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px 20px; border-bottom:1px solid var(--hair); padding-bottom:16px}
+.masthead h1{
+  font-family:var(--serif); font-weight:600; font-size:clamp(23px,3.4vw,32px);
+  margin:0; letter-spacing:.08em; text-wrap:balance;
+}
+.masthead .sub{margin:0; color:var(--ink-dim); font-size:13px; max-width:46ch}
+.stamp{
+  margin-left:auto; font-family:var(--label); font-weight:600; font-size:11px;
+  letter-spacing:.22em; text-transform:uppercase; color:var(--signal);
+  border:1px solid rgba(226,80,58,.45); border-radius:2px; padding:3px 9px; white-space:nowrap;
+}
+.stack{display:grid; gap:20px; min-width:0}
+
+/* ---------- 共通：機材の面 ---------- */
+.gear{
+  border-radius:var(--r-md);
+  box-shadow:0 22px 44px -20px #000, 0 2px 0 rgba(255,255,255,.05) inset, 0 -2px 6px rgba(0,0,0,.5) inset;
+}
+.brushed{
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, rgba(0,0,0,.05) 1px 3px),
+    linear-gradient(178deg, var(--panel-hi) 0%, var(--panel) 34%, #8D8677 66%, var(--panel-lo) 100%);
+}
+.silk{font-family:var(--label); font-weight:600; font-size:10px; letter-spacing:.19em; text-transform:uppercase}
+
+/* ---------- ブラウン管テレビ ---------- */
+.tv{
+  position:relative; padding:16px 16px 14px;
+  background:
+    repeating-linear-gradient(91deg, rgba(0,0,0,.035) 0 2px, transparent 2px 5px),
+    linear-gradient(176deg, var(--plastic), #BFB49B 60%, var(--plastic-lo));
+  border-radius:16px 16px 10px 10px;
+  display:grid; grid-template-columns:minmax(0,1fr) 76px; gap:14px; align-items:stretch;
+}
+.tv::after{ /* 天面の擦り傷 */
+  content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+  background:radial-gradient(100% 40% at 20% 0%, rgba(255,255,255,.28), transparent 55%);
+  mix-blend-mode:soft-light;
+}
+.screen-shell{
+  position:relative; background:#0A0D0C; border-radius:22px/16px;
+  padding:11px;
+  box-shadow:0 0 0 2px #6F6653, 0 0 0 3px rgba(255,255,255,.14), 0 10px 22px -8px #000 inset;
+}
+.screen{
+  position:relative; aspect-ratio:4/3; width:100%; max-width:100%;
+  border-radius:26px/20px; overflow:hidden; background:#05070A;
+  box-shadow:0 0 34px -6px rgba(124,242,200,.16) inset, 0 0 0 1px rgba(0,0,0,.9);
+}
+.screen canvas{display:block; width:100%; height:100%}
+.screen .glass{
+  position:absolute; inset:0; pointer-events:none;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.34) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 100% at 50% 50%, transparent 52%, rgba(0,0,0,.72) 100%),
+    linear-gradient(107deg, rgba(255,255,255,.11) 0 24%, transparent 46%);
+}
+.screen .osd{
+  position:absolute; left:14px; bottom:11px; right:14px; display:flex; gap:12px; align-items:baseline;
+  font-family:var(--pixel); font-size:13px; color:#DFFCF0;
+  text-shadow:0 0 7px rgba(124,242,200,.85); pointer-events:none;
+}
+.screen .osd .ch{margin-left:auto; opacity:.85}
+.tv-side{display:flex; flex-direction:column; gap:12px; align-items:center; justify-content:flex-start; padding-top:6px}
+.grille{
+  width:100%; height:86px; border-radius:var(--r-sm);
+  background:repeating-linear-gradient(0deg,#8C8368 0 2px, rgba(0,0,0,.42) 2px 5px);
+  box-shadow:0 1px 0 rgba(255,255,255,.3), 0 2px 5px rgba(0,0,0,.4) inset;
+}
+.knob{
+  width:46px; height:46px; border-radius:50%;
+  background:conic-gradient(from 210deg,#5B5445,#8C836C 25%,#4A4437 55%,#7E7660 78%,#5B5445);
+  box-shadow:0 3px 6px rgba(0,0,0,.55), 0 0 0 3px #B7AC91, 0 1px 0 rgba(255,255,255,.4) inset;
+  position:relative; flex:none;
+}
+.knob::after{content:""; position:absolute; left:50%; top:6px; width:2px; height:13px; margin-left:-1px; background:#E7DEC6; border-radius:1px}
+.tv-badge{font-family:var(--label);font-weight:700;font-size:9px;letter-spacing:.2em;color:#4E4738;text-transform:uppercase}
+.led{width:7px;height:7px;border-radius:50%;background:var(--signal);box-shadow:0 0 9px var(--signal);flex:none}
+
+/* ---------- CDデッキ ---------- */
+.deck{
+  padding:16px; display:grid; gap:16px;
+  grid-template-columns:198px minmax(0,1fr);
+  border-top:1px solid rgba(255,255,255,.28);
+}
+.deck-head{grid-column:1/-1; display:flex; align-items:center; gap:10px; margin-bottom:-4px}
+.deck-head .silk{color:#3E3931}
+.deck-head .rule{flex:1; height:1px; background:rgba(0,0,0,.24)}
+
+/* ディスク室（丸窓） */
+.chamber{
+  position:relative; aspect-ratio:1; width:100%;
+  border-radius:50%; background:radial-gradient(circle at 50% 40%, #16181B, #050607 78%);
+  box-shadow:0 0 0 2px #6C6558, 0 0 0 4px rgba(255,255,255,.2), 0 12px 26px -10px #000 inset;
+  display:grid; place-items:center; overflow:hidden;
+}
+.chamber .spindle{
+  position:absolute; width:26px; height:26px; border-radius:50%;
+  background:radial-gradient(circle at 40% 35%, #9E978A, #3A362F);
+  box-shadow:0 2px 4px rgba(0,0,0,.7);
+}
+.chamber .glassdome{
+  position:absolute; inset:0; border-radius:50%; pointer-events:none;
+  background:linear-gradient(122deg, rgba(255,255,255,.20) 0 26%, transparent 44%, transparent 70%, rgba(255,255,255,.07) 100%);
+}
+.chamber .empty{
+  font-family:var(--pixel); font-size:12px; color:var(--ink-faint); letter-spacing:.1em;
+  transform:translateY(30px);
+}
+.disc{
+  position:relative; width:100%; height:100%; border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 50%, transparent 0 13%, rgba(0,0,0,.55) 13% 14.5%, transparent 14.5%),
+    conic-gradient(from 0deg, #6ad6ff,#a58cff,#ff8fc7,#ffd36b,#8dffc0,#6ad6ff),
+    #20242a;
+  box-shadow:0 0 0 1px rgba(0,0,0,.7), 0 6px 16px -6px #000;
+}
+.disc::before{ /* 虹色の抑制＋盤面の艶 */
+  content:""; position:absolute; inset:0; border-radius:50%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(10,12,14,.92) 0 30%, rgba(10,12,14,.34) 34%, rgba(10,12,14,.62) 60%, rgba(10,12,14,.3) 100%),
+    linear-gradient(135deg, rgba(255,255,255,.30) 0 18%, transparent 38%);
+}
+.disc .label{
+  position:absolute; inset:26%; border-radius:50%;
+  background:var(--c,#DCD5C6);
+  display:grid; place-items:center; gap:0;
+  box-shadow:0 0 0 1px rgba(0,0,0,.35);
+}
+.disc .label::after{content:""; position:absolute; width:26%; height:26%; border-radius:50%; background:#0B0D10; box-shadow:0 0 0 4px rgba(255,255,255,.55)}
+.disc .label .n{
+  font-family:var(--label); font-weight:700; font-size:clamp(11px,4.5cqw,20px);
+  color:rgba(0,0,0,.62); letter-spacing:.06em; transform:translateY(-118%);
+}
+.chamber .disc{width:86%; height:86%}
+.chamber .disc .label .n{font-size:19px}
+.spinning{animation:spin 1.9s linear infinite}
+.spinning.paused{animation-play-state:paused}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 表示管 */
+.readout{display:grid; gap:12px; align-content:start; min-width:0}
+.vfd{
+  border-radius:var(--r-sm); padding:11px 13px 12px;
+  background:linear-gradient(180deg,#06110D,#040B09);
+  box-shadow:0 0 0 2px #55503F, 0 6px 14px -6px #000 inset, 0 0 22px -6px rgba(124,242,200,.34) inset;
+  font-family:var(--pixel); color:var(--vfd); text-shadow:0 0 8px rgba(124,242,200,.6);
+  display:grid; gap:7px; min-width:0;
+}
+.vfd .row1{display:flex; align-items:baseline; gap:10px; font-size:11px; letter-spacing:.14em; color:var(--vfd)}
+.vfd .row1 .mode{color:#E9FFF7}
+.vfd .row1 .dim{color:var(--vfd-dim)}
+.vfd .title{font-size:17px; letter-spacing:.05em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:#E9FFF7}
+.vfd .row3{display:flex; align-items:center; gap:10px; font-size:12px; font-variant-numeric:tabular-nums}
+.vfd .time{font-variant-numeric:tabular-nums}
+.meter{display:flex; gap:2px; align-items:flex-end; height:14px; margin-left:auto}
+.meter i{width:3px; background:#1D4A3E; height:4px; border-radius:1px; box-shadow:0 0 0 1px rgba(124,242,200,.10)}
+.meter i.on{background:var(--vfd); box-shadow:0 0 5px rgba(124,242,200,.8)}
+
+/* シークバー */
+.seek{position:relative; height:22px; display:flex; align-items:center; cursor:pointer; touch-action:none}
+.seek .track{position:relative; width:100%; height:5px; border-radius:3px; background:rgba(0,0,0,.42); box-shadow:0 1px 0 rgba(255,255,255,.22)}
+.seek .fill{position:absolute; inset:0 auto 0 0; width:0%; border-radius:3px; background:linear-gradient(90deg,#3E7F6C,var(--vfd)); box-shadow:0 0 8px rgba(124,242,200,.5)}
+.seek .head{position:absolute; top:50%; left:0; width:11px; height:11px; margin:-5.5px 0 0 -5.5px; border-radius:50%; background:#EFE9DA; box-shadow:0 1px 3px rgba(0,0,0,.7)}
+
+/* トランスポート */
+.transport{display:flex; flex-wrap:wrap; gap:7px; align-items:center}
+.tb{
+  min-width:46px; height:34px; padding:0 10px; border-radius:var(--r-sm);
+  display:inline-grid; place-items:center;
+  background:linear-gradient(180deg,#3A3D44,#22252B 62%,#16181D);
+  box-shadow:0 1px 0 rgba(255,255,255,.22) inset, 0 -2px 3px rgba(0,0,0,.5) inset, 0 3px 5px -2px rgba(0,0,0,.6);
+  color:#D9D3C6;
+}
+.tb:hover{background:linear-gradient(180deg,#454951,#272B32 62%,#191C21)}
+.tb:active{transform:translateY(1px); box-shadow:0 2px 5px rgba(0,0,0,.6) inset}
+.tb svg{width:15px; height:15px; fill:currentColor; display:block}
+.tb.play{min-width:62px; color:#0B1310; background:linear-gradient(180deg,#9BF6D6,#59C8A6 60%,#3E9B80)}
+.tb.play:hover{background:linear-gradient(180deg,#B4FFE4,#6BD8B5 60%,#43A487)}
+.tb[disabled]{opacity:.38; cursor:not-allowed; transform:none}
+.vol{display:flex; align-items:center; gap:8px; margin-left:auto; color:#3E3931}
+.vol input{width:88px; accent-color:#3E7F6C}
+.vol .silk{color:#3E3931}
+
+/* ---------- ディスクラック ---------- */
+.rack{
+  padding:15px 16px 17px; border-radius:var(--r-md);
+  background:linear-gradient(180deg,#20232A,#15171C);
+  box-shadow:0 1px 0 rgba(255,255,255,.06) inset, 0 20px 40px -24px #000;
+  border:1px solid rgba(255,255,255,.06);
+}
+.rack-head{display:flex; align-items:center; gap:10px; margin-bottom:13px}
+.rack-head .silk{color:var(--ink-dim)}
+.rack-head .rule{flex:1; height:1px; background:var(--hair)}
+.shelf{display:grid; gap:10px; grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+.slot{
+  container-type:inline-size;
+  display:grid; gap:8px; justify-items:center; padding:9px 7px 10px; border-radius:var(--r-sm);
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  border:1px solid rgba(255,255,255,.055); text-align:center;
+  transition:transform .18s ease, border-color .18s ease, background .18s ease;
+}
+.slot:hover{transform:translateY(-4px); border-color:rgba(255,255,255,.16); background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.02))}
+.slot .disc{width:70px; height:70px; transition:transform .18s ease}
+.slot:hover .disc{transform:rotate(-8deg)}
+.slot .nm{font-family:var(--body); font-size:12px; line-height:1.35; color:var(--ink)}
+.slot .dur{font-family:var(--pixel); font-size:10.5px; color:var(--ink-faint); letter-spacing:.06em}
+.slot[aria-current="true"]{border-color:var(--c); background:color-mix(in srgb, var(--c) 12%, transparent)}
+.slot[aria-current="true"] .nm{color:var(--c)}
+.flyer{position:fixed; z-index:60; pointer-events:none; transition:transform .68s cubic-bezier(.5,.02,.2,1), opacity .68s ease}
+
+/* ---------- 歌詞カード ---------- */
+.booklet{
+  position:sticky; top:22px; align-self:start;
+  background:linear-gradient(178deg,#F2ECDE,#E4DCC9);
+  color:#1E1B15; border-radius:var(--r-sm);
+  padding:20px 20px 22px;
+  box-shadow:0 20px 40px -22px #000, 0 0 0 1px rgba(0,0,0,.5);
+  max-height:calc(100vh - 60px); display:flex; flex-direction:column; min-width:0;
+}
+.booklet .bk-head{display:flex; align-items:baseline; gap:9px; border-bottom:1px solid rgba(30,27,21,.22); padding-bottom:10px; margin-bottom:14px}
+.booklet .bk-head .silk{color:#6A6152}
+.booklet .bk-head .tag{margin-left:auto; font-family:var(--label); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#9A5C4B; border:1px solid rgba(154,92,75,.4); padding:1px 6px; border-radius:2px}
+.lyrics{overflow-y:auto; font-family:var(--serif); font-size:15.5px; line-height:2.15; display:grid; gap:2px; scrollbar-width:thin}
+.lyrics p{margin:0; color:rgba(30,27,21,.42); transition:color .35s ease}
+.lyrics p.past{color:rgba(30,27,21,.5)}
+.lyrics p.now{color:#1E1B15; font-weight:600}
+.lyrics p.now::before{content:"▍"; color:#9A5C4B; margin-left:-.85em; margin-right:.15em}
+.lyrics p.br{height:.5em}
+.bk-foot{margin-top:14px; padding-top:11px; border-top:1px solid rgba(30,27,21,.18); font-size:11.5px; color:#6A6152; line-height:1.65}
+
+/* ---------- 仕様メモ ---------- */
+.spec{grid-column:1/-1; display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(216px,1fr)); border-top:1px solid var(--hair); padding-top:20px}
+.spec h2{grid-column:1/-1; font-family:var(--label); font-weight:600; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink-dim); margin:0}
+.spec dl{margin:0; display:grid; gap:3px; align-content:start}
+.spec dt{font-family:var(--label); font-weight:600; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--vfd)}
+.spec dd{margin:0; font-size:12.5px; color:var(--ink-dim); line-height:1.7}
+.spec code{font-family:var(--pixel); font-size:12px; color:var(--ink); background:rgba(255,255,255,.05); padding:0 4px; border-radius:2px}
+
+@media (max-width:900px){
+  .room{grid-template-columns:minmax(0,1fr)}
+  .booklet{position:static; max-height:none}
+  .lyrics{max-height:52vh}
+  .deck{grid-template-columns:minmax(0,1fr)}
+  .chamber{max-width:190px; margin-inline:auto}
+}
+@media (max-width:430px){
+  .tv{grid-template-columns:minmax(0,1fr); }
+  .tv-side{flex-direction:row; align-items:center; justify-content:space-between}
+  .grille{width:auto; flex:1; height:26px; background:repeating-linear-gradient(90deg,#8C8368 0 2px, rgba(0,0,0,.42) 2px 5px)}
+  .vol{margin-left:0; width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  .spinning{animation:none}
+  .slot,.slot .disc,.flyer{transition:none}
+}
+</style>
+
+<div class="room">
+  <header class="masthead">
+    <div>
+      <h1>七枚の同じ歌</h1>
+      <p class="sub">おなじ歌詞を、七通りの旋律で。ディスクを選んで、デッキに入れてください。</p>
+    </div>
+    <span class="stamp">試作 v0.1 / 音は仮</span>
+  </header>
+
+  <div class="stack">
+
+    <!-- ブラウン管テレビ -->
+    <section class="tv gear" aria-label="ブラウン管モニター">
+      <div class="screen-shell">
+        <div class="screen">
+          <canvas id="crt" width="640" height="480" aria-label="映像"></canvas>
+          <div class="glass"></div>
+          <div class="osd"><span id="osdMode">STANDBY</span><span id="osdTime">0:00</span><span class="ch" id="osdCh">CH --</span></div>
+        </div>
+      </div>
+      <div class="tv-side">
+        <div class="grille" aria-hidden="true"></div>
+        <div class="knob" aria-hidden="true"></div>
+        <span class="tv-badge">Tuning</span>
+        <span class="led" aria-hidden="true"></span>
+      </div>
+    </section>
+
+    <!-- CDデッキ -->
+    <section class="deck gear brushed" aria-label="CDプレーヤー">
+      <div class="deck-head">
+        <span class="silk">Compact Disc Player &nbsp;—&nbsp; Model SEVEN</span>
+        <span class="rule"></span>
+        <span class="silk">Digital Audio</span>
+      </div>
+
+      <div class="chamber" id="chamber">
+        <span class="glassdome" aria-hidden="true"></span>
+        <span class="spindle" aria-hidden="true"></span>
+        <span class="empty" id="chamberEmpty">NO DISC</span>
+      </div>
+
+      <div class="readout">
+        <div class="vfd">
+          <div class="row1">
+            <span class="mode" id="vfdMode">■ STOP</span>
+            <span id="vfdTrack" class="dim">TRACK --</span>
+            <span id="vfdRepeat" class="dim">ALL</span>
+          </div>
+          <div class="title" id="vfdTitle">ディスクを えらんでください</div>
+          <div class="row3">
+            <span class="time" id="vfdElapsed">0:00</span>
+            <span class="dim">/</span>
+            <span class="time dim" id="vfdTotal">0:00</span>
+            <span class="meter" id="meter" aria-hidden="true"></span>
+          </div>
+        </div>
+
+        <div class="seek" id="seek" role="slider" tabindex="0" aria-label="再生位置" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <span class="track"><span class="fill" id="seekFill"></span><span class="head" id="seekHead"></span></span>
+        </div>
+
+        <div class="transport">
+          <button class="tb" id="btnPrev" title="前の曲" aria-label="前の曲"><svg viewBox="0 0 24 24"><path d="M6 5h2.5v14H6zM20 5v14L9.5 12z"/></svg></button>
+          <button class="tb" id="btnRew" title="巻き戻し（長押しで早戻し）" aria-label="巻き戻し"><svg viewBox="0 0 24 24"><path d="M11.5 5v14L2 12zM22 5v14l-9.5-7z"/></svg></button>
+          <button class="tb play" id="btnPlay" title="再生 / 一時停止" aria-label="再生"><svg id="playIcon" viewBox="0 0 24 24"><path d="M7 4l13 8-13 8z"/></svg></button>
+          <button class="tb" id="btnFf" title="早送り（長押しで早送り）" aria-label="早送り"><svg viewBox="0 0 24 24"><path d="M2 5l9.5 7L2 19zM12.5 5L22 12l-9.5 7z"/></svg></button>
+          <button class="tb" id="btnNext" title="次の曲" aria-label="次の曲"><svg viewBox="0 0 24 24"><path d="M15.5 5H18v14h-2.5zM4 5l10.5 7L4 19z"/></svg></button>
+          <button class="tb" id="btnEject" title="ディスクを取り出す" aria-label="取り出し"><svg viewBox="0 0 24 24"><path d="M12 4l8 10H4zM4 17h16v3H4z"/></svg></button>
+          <span class="vol"><span class="silk">Vol</span><input id="vol" type="range" min="0" max="100" value="62" aria-label="音量"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ディスクラック -->
+    <section class="rack" aria-label="ディスク棚">
+      <div class="rack-head">
+        <span class="silk">Disc Library &nbsp;/&nbsp; 7 Discs, One Lyric</span>
+        <span class="rule"></span>
+        <span class="silk" id="rackHint">Tap to load</span>
+      </div>
+      <div class="shelf" id="shelf"></div>
+    </section>
+  </div>
+
+  <!-- 歌詞カード -->
+  <aside class="booklet" aria-label="歌詞カード">
+    <div class="bk-head">
+      <span class="silk">Lyrics</span>
+      <span class="tag">仮歌詞</span>
+    </div>
+    <div class="lyrics" id="lyrics"></div>
+    <p class="bk-foot">七枚とも歌詞は同じ。旋律だけが変わります。<br>本番の歌詞は <code>LYRICS</code> を差し替えるだけで反映されます。</p>
+  </aside>
+
+  <section class="spec">
+    <h2>差し替えの手順 — Handover</h2>
+    <dl>
+      <dt>音源</dt>
+      <dd><code>assets/audio/01.mp3</code> 〜 <code>07.mp3</code> を置き、<code>TRACKS</code> の <code>src</code> に書くだけ。いま鳴っているのは仮のデモ音（自動生成）です。</dd>
+    </dl>
+    <dl>
+      <dt>歌詞</dt>
+      <dd>七曲共通なので <code>LYRICS</code> に一度書くだけ。空行は <code>""</code> で入れます。行の送りは尺に合わせて自動、<code>cues</code> を書けば手動同期。</dd>
+    </dl>
+    <dl>
+      <dt>ブラウン管の映像</dt>
+      <dd><code>visual</code> に画像か <code>.mp4</code> を指定すると、走査線・湾曲・にじみを乗せて再生。未指定の曲は曲ごとの自動生成映像になります。</dd>
+    </dl>
+    <dl>
+      <dt>渡しかた</dt>
+      <dd>GitHub Pages に置いてURLを送るのが一番かんたん。オフラインで渡すならZIPごと。曲名・色・尺も <code>TRACKS</code> の一箇所で変更できます。</dd>
+    </dl>
+  </section>
+</div>
+
+<script>
+/* ============================================================
+   七枚の同じ歌 — prototype logic
+   ここから下、TRACKS と LYRICS を書き換えれば本番になります。
+   ============================================================ */
+
+/* ---------- 1. 曲の設定（差し替えポイント） ---------- */
+const TRACKS = [
+  { n:'01', title:'あさやけ',   tag:'MORNING PIANO', c:'#FFC46B', dur:204, scene:0,
+    src:null, visual:null, demo:{bpm:76,  root:60, minor:false, prog:[0,5,3,4], wave:'triangle', mel:[0,2,4,7,4,2,null,0, 4,5,7,9,7,4,2,null], dly:.34} },
+  { n:'02', title:'まちあわせ', tag:'CITY POP',      c:'#7FB8FF', dur:238, scene:1,
+    src:null, visual:null, demo:{bpm:104, root:62, minor:false, prog:[1,4,0,5], wave:'sawtooth', mel:[7,null,7,9,11,9,7,4, 5,null,5,7,9,7,5,2], dly:.26} },
+  { n:'03', title:'ひるさがり', tag:'BOSSA',         c:'#C8F06B', dur:192, scene:2,
+    src:null, visual:null, demo:{bpm:92,  root:57, minor:true,  prog:[0,3,4,3], wave:'sine',     mel:[4,5,7,null,9,7,5,4, 2,4,5,null,7,5,4,2], dly:.30} },
+  { n:'04', title:'ゆうなぎ',   tag:'BALLAD',        c:'#FF8FA8', dur:246, scene:3,
+    src:null, visual:null, demo:{bpm:66,  root:55, minor:false, prog:[0,4,5,3], wave:'triangle', mel:[0,null,4,null,7,null,9,null, 7,null,5,null,4,null,2,null], dly:.42} },
+  { n:'05', title:'よみち',     tag:'SYNTH WAVE',    c:'#A98CFF', dur:220, scene:4,
+    src:null, visual:null, demo:{bpm:118, root:59, minor:true,  prog:[0,5,3,4], wave:'square',   mel:[0,0,7,0,5,0,4,0, 2,2,7,2,4,2,0,null], dly:.22} },
+  { n:'06', title:'ほしぞら',   tag:'MUSIC BOX',     c:'#7CF2C8', dur:178, scene:5,
+    src:null, visual:null, demo:{bpm:84,  root:72, minor:false, prog:[0,3,4,0], wave:'sine',     mel:[7,9,11,9,7,4,null,2, 4,7,9,7,4,2,null,0], dly:.38} },
+  { n:'07', title:'あさになる', tag:'ACOUSTIC',      c:'#FF7A4A', dur:262, scene:6,
+    src:null, visual:null, demo:{bpm:72,  root:64, minor:false, prog:[0,4,3,5], wave:'triangle', mel:[0,2,4,null,5,4,2,0, 4,2,0,null,-3,0,2,null], dly:.36} },
+];
+
+/* ---------- 2. 歌詞（七曲共通・差し替えポイント） ---------- */
+const LYRICS = [
+  'なんでもない日の 帰り道で',
+  'きみが笑った それだけのこと',
+  '',
+  'おなじ空を 何度も見上げて',
+  'おなじ言葉を 違う声で言う',
+  '',
+  'ひとつの詞に 七つの旋律',
+  'どれがすきかは きみが決めて',
+  '',
+  '朝が来るまで 鳴らしていて',
+  'この歌はもう きみのものだから',
+  '',
+  'また会う日まで しまっておいて',
+];
+
+/* ---------- 3. 小道具 ---------- */
+const $ = s => document.querySelector(s);
+const clamp = (v,a,b) => v<a?a:v>b?b:v;
+const mmss = s => { s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const MAJOR=[0,2,4,5,7,9,11], MINOR=[0,2,3,5,7,8,10];
+const deg = (d,minor) => { const sc = minor?MINOR:MAJOR; const o=Math.floor(d/7); return sc[((d%7)+7)%7]+12*o; };
+const hz = m => 440*Math.pow(2,(m-69)/12);
+
+/* ---------- 4. 音まわり ---------- */
+let AC=null, master=null, analyser=null, delayWet=null, freqData=null, waveData=null, elSrc=null;
+function initAudio(){
+  if(AC) return;
+  AC = new (window.AudioContext||window.webkitAudioContext)();
+  master = AC.createGain(); master.gain.value = volOf();
+  analyser = AC.createAnalyser(); analyser.fftSize = 512; analyser.smoothingTimeConstant = .8;
+  freqData = new Uint8Array(analyser.frequencyBinCount);
+  waveData = new Uint8Array(analyser.fftSize);
+  const dl = AC.createDelay(1.0); dl.delayTime.value=.3;
+  const fb = AC.createGain(); fb.gain.value=.28;
+  delayWet = AC.createGain(); delayWet.gain.value=.2;
+  dl.connect(fb); fb.connect(dl); dl.connect(delayWet); delayWet.connect(master);
+  master.connect(analyser); analyser.connect(AC.destination);
+  audio.delay = dl;
+}
+function volOf(){ return Math.pow(($('#vol').value||62)/100, 1.6) * .9; }
+
+const audio = {
+  mode:'synth', el:null, delay:null,
+  timer:null, step:0, nextTime:0, startCtx:0, startPos:0, playing:false, pos:0, dur:0, t:null,
+
+  load(track){
+    this.stopSched();
+    this.playing=false; this.pos=0; this.t=track; this.dur=track.dur||180;
+    if(this.el){ this.el.pause(); this.el.src=''; this.el=null; }
+    if(track.src){
+      this.mode='file';
+      initAudio();
+      const el = new Audio(track.src); el.preload='metadata';
+      el.addEventListener('loadedmetadata', ()=>{ if(isFinite(el.duration)) { this.dur=el.duration; ui.paint(); } });
+      el.addEventListener('ended', ()=> ui.trackEnded());
+      try{ elSrc = AC.createMediaElementSource(el); elSrc.connect(master); elSrc.connect(this.delay); }catch(e){}
+      this.el = el;
+    } else {
+      this.mode='synth'; this.d = track.demo;
+    }
+  },
+  play(){
+    if(!this.t) return;
+    initAudio(); if(AC.state==='suspended') AC.resume();
+    master.gain.value = volOf();
+    this.playing = true;
+    if(this.mode==='file'){ this.el.currentTime = this.pos; this.el.play().catch(()=>{}); }
+    else{ this.delay.delayTime.value = this.d.dly; this.startSched(); }
+  },
+  pause(){
+    this.playing = false;
+    if(this.mode==='file'){ this.pos = this.el.currentTime; this.el.pause(); }
+    else { this.pos = this.position(); this.stopSched(); }
+  },
+  seek(t){
+    t = clamp(t, 0, this.dur);
+    this.pos = t;
+    if(this.mode==='file'){ this.el.currentTime = t; }
+    else if(this.playing){ this.stopSched(); this.startSched(); }
+  },
+  position(){
+    if(!this.t) return 0;
+    if(this.mode==='file') return this.el ? this.el.currentTime : 0;
+    return this.playing ? Math.min(this.dur, this.startPos + (AC.currentTime - this.startCtx)) : this.pos;
+  },
+  /* --- 仮デモ音の生成 --- */
+  startSched(){
+    const stepDur = 60/this.d.bpm/2;
+    this.step = Math.floor(this.pos/stepDur);
+    this.startCtx = AC.currentTime; this.startPos = this.pos;
+    this.nextTime = AC.currentTime + .06;
+    this.timer = setInterval(()=>{
+      if(!this.playing) return;
+      while(this.nextTime < AC.currentTime + .22){
+        this.emit(this.step, this.nextTime, stepDur);
+        this.nextTime += stepDur; this.step++;
+      }
+    }, 25);
+  },
+  stopSched(){ if(this.timer){ clearInterval(this.timer); this.timer=null; } },
+  emit(step, time, stepDur){
+    const d = this.d, bar = Math.floor(step/8), ci = d.prog[bar % d.prog.length];
+    const chordRoot = d.root + deg(ci, d.minor);
+    if(step % 8 === 0){                                  // パッド（和音）
+      [0,2,4].forEach(iv => this.note(time, chordRoot + deg(ci+iv, d.minor) - deg(ci, d.minor), stepDur*7.6, 'sine', .045, 900));
+      this.note(time, chordRoot-24, stepDur*7, 'sine', .085, 380);  // ベース
+    }
+    if(step % 8 === 4) this.note(time, chordRoot-17, stepDur*3.4, 'sine', .06, 380);
+    const m = d.mel[step % d.mel.length];
+    if(m !== null && m !== undefined){
+      this.note(time, d.root + 12 + deg(m, d.minor), stepDur*1.7, d.wave, .10, 2600);
+    }
+  },
+  note(time, midi, dur, wave, gain, cutoff){
+    const o = AC.createOscillator(), g = AC.createGain(), f = AC.createBiquadFilter();
+    o.type = wave; o.frequency.value = hz(midi);
+    f.type='lowpass'; f.frequency.value=cutoff; f.Q.value=.6;
+    const a = wave==='sine' ? .06 : .012;
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(gain, time+a);
+    g.gain.exponentialRampToValueAtTime(.0008, time+dur);
+    o.connect(f); f.connect(g); g.connect(master); g.connect(this.delay);
+    o.start(time); o.stop(time+dur+.05);
+  }
+};
+
+/* ---------- 5. 画面の状態 ---------- */
+const ui = {
+  index:-1, loaded:false, lines:[], curLine:-1,
+
+  build(){
+    const shelf = $('#shelf');
+    TRACKS.forEach((t,i)=>{
+      const b = document.createElement('button');
+      b.className='slot'; b.type='button'; b.style.setProperty('--c', t.c);
+      b.setAttribute('aria-current','false');
+      b.innerHTML = `<span class="disc" style="--c:${t.c}"><span class="label"><span class="n">${t.n}</span></span></span>
+        <span class="nm">${t.title}</span><span class="dur">${t.tag} · ${mmss(t.dur)}</span>`;
+      b.addEventListener('click', ()=> this.select(i, b));
+      shelf.appendChild(b);
+    });
+    const wrap = $('#lyrics');
+    LYRICS.forEach(l=>{
+      const p = document.createElement('p');
+      if(l===''){ p.className='br'; } else { p.textContent = l; this.lines.push(p); }
+      wrap.appendChild(p);
+    });
+    const m = $('#meter');
+    for(let i=0;i<14;i++) m.appendChild(document.createElement('i'));
+  },
+
+  select(i, btn){
+    initAudio(); if(AC.state==='suspended') AC.resume();
+    if(this.index === i){ this.toggle(); return; }
+    const wasLoaded = this.loaded;
+    this.index = i; const t = TRACKS[i];
+    document.querySelectorAll('.slot').forEach((s,j)=> s.setAttribute('aria-current', j===i ? 'true':'false'));
+    audio.load(t);
+    this.insertDisc(btn, wasLoaded, ()=>{ this.play(); });
+    this.paint();
+  },
+
+  /* ディスクが棚からデッキへ飛んでいく */
+  insertDisc(btn, replace, done){
+    const t = TRACKS[this.index], chamber = $('#chamber');
+    const src = btn ? btn.querySelector('.disc') : null;
+    const old = chamber.querySelector('.disc');
+    if(old) old.remove();
+    $('#chamberEmpty').style.display = 'none';
+    const put = ()=>{
+      const d = document.createElement('span');
+      d.className = 'disc'; d.style.setProperty('--c', t.c);
+      d.innerHTML = `<span class="label"><span class="n">${t.n}</span></span>`;
+      chamber.appendChild(d);
+      this.loaded = true; done && done();
+    };
+    if(!src || reduced){ put(); return; }
+    const a = src.getBoundingClientRect(), target = chamber.getBoundingClientRect();
+    const size = target.width * .86;
+    const fly = src.cloneNode(true);
+    fly.className = 'disc flyer';
+    Object.assign(fly.style, {left:a.left+'px', top:a.top+'px', width:a.width+'px', height:a.height+'px'});
+    document.body.appendChild(fly);
+    const tx = target.left + (target.width - size)/2 - a.left;
+    const ty = target.top + (target.height - size)/2 - a.top;
+    requestAnimationFrame(()=>{
+      fly.style.transform = `translate(${tx}px, ${ty}px) scale(${size/a.width}) rotate(200deg)`;
+    });
+    setTimeout(()=>{ fly.remove(); put(); }, 700);
+  },
+
+  eject(){
+    if(!this.loaded) return;
+    audio.pause(); audio.pos = 0;
+    const d = $('#chamber .disc');
+    if(d){ d.style.transition='transform .4s ease, opacity .4s ease'; d.style.transform='translateY(-24px) scale(.8)'; d.style.opacity='0'; setTimeout(()=>d.remove(), 400); }
+    $('#chamberEmpty').style.display = '';
+    this.loaded = false; this.index = -1;
+    document.querySelectorAll('.slot').forEach(s=> s.setAttribute('aria-current','false'));
+    this.setLine(-1); this.paint();
+  },
+
+  play(){ if(!this.loaded) return; audio.play(); this.paint(); },
+  toggle(){ if(!this.loaded){ this.select(0, document.querySelector('.slot')); return; } audio.playing ? audio.pause() : audio.play(); this.paint(); },
+  skip(dir){
+    if(!this.loaded){ this.select(0, document.querySelector('.slot')); return; }
+    const i = (this.index + dir + TRACKS.length) % TRACKS.length;
+    const was = audio.playing;
+    this.index = -1; this.select(i, document.querySelectorAll('.slot')[i]);
+    if(!was) setTimeout(()=>{ audio.pause(); this.paint(); }, 720);
+  },
+  trackEnded(){ this.skip(1); },
+
+  paint(){
+    const t = TRACKS[this.index];
+    const playing = audio.playing;
+    $('#playIcon').innerHTML = playing ? '<path d="M6 4h4v16H6zM14 4h4v16h-4z"/>' : '<path d="M7 4l13 8-13 8z"/>';
+    $('#btnPlay').setAttribute('aria-label', playing ? '一時停止' : '再生');
+    $('#vfdMode').textContent = !this.loaded ? '■ STOP' : playing ? '▶ PLAY' : '❚❚ PAUSE';
+    $('#vfdTrack').textContent = t ? 'TRACK '+t.n : 'TRACK --';
+    $('#vfdTitle').textContent = t ? t.title + '  —  ' + t.tag : 'ディスクを えらんでください';
+    $('#vfdTotal').textContent = mmss(audio.dur || 0);
+    $('#osdCh').textContent = t ? 'CH '+t.n : 'CH --';
+    $('#osdMode').textContent = !this.loaded ? 'STANDBY' : playing ? '▶ PLAY' : '❚❚ PAUSE';
+    $('#rackHint').textContent = this.loaded ? 'Tap to swap' : 'Tap to load';
+    ['#btnRew','#btnFf','#btnEject'].forEach(s=> $(s).disabled = !this.loaded);
+    const d = $('#chamber .disc');
+    if(d) d.classList.toggle('spinning', true), d.classList.toggle('paused', !playing);
+  },
+
+  setLine(i){
+    if(i === this.curLine) return;
+    this.curLine = i;
+    this.lines.forEach((p,j)=>{
+      p.classList.toggle('now', j===i);
+      p.classList.toggle('past', j<i);
+    });
+    const box = $('#lyrics'), p = this.lines[i];
+    if(p && box.scrollHeight > box.clientHeight + 4){
+      box.scrollTo({top: p.offsetTop - box.clientHeight/2 + p.offsetHeight/2, behavior: reduced ? 'auto':'smooth'});
+    }
+  },
+
+  tick(){
+    const pos = audio.position(), dur = audio.dur || 1;
+    if(this.loaded && audio.mode==='synth' && audio.playing && pos >= dur - .05) this.trackEnded();
+    const pct = clamp(pos/dur*100, 0, 100);
+    $('#seekFill').style.width = pct+'%';
+    $('#seekHead').style.left = pct+'%';
+    $('#seek').setAttribute('aria-valuenow', Math.round(pct));
+    $('#vfdElapsed').textContent = mmss(this.loaded ? pos : 0);
+    $('#osdTime').textContent = mmss(this.loaded ? pos : 0);
+    // 歌詞：cues があればそれ、無ければ尺で等分
+    if(this.loaded && this.lines.length){
+      const t = TRACKS[this.index];
+      let idx = -1;
+      if(t.cues){ for(let i=0;i<t.cues.length;i++) if(pos >= t.cues[i]) idx = i; }
+      else{
+        const intro = dur*.09, span = dur*.80;
+        idx = pos < intro ? -1 : Math.min(this.lines.length-1, Math.floor((pos-intro)/(span/this.lines.length)));
+      }
+      this.setLine(idx);
+    }
+    // レベルメーター
+    if(analyser){
+      analyser.getByteFrequencyData(freqData);
+      const bars = $('#meter').children;
+      for(let i=0;i<bars.length;i++){
+        const v = freqData[2 + i*3] / 255;
+        bars[i].style.height = (4 + v*10).toFixed(1)+'px';
+        bars[i].classList.toggle('on', audio.playing && v > .06);
+      }
+    }
+  }
+};
+
+/* ---------- 6. ブラウン管の映像 ---------- */
+const crt = (()=>{
+  const cv = $('#crt'), g = cv.getContext('2d'), W = cv.width, H = cv.height;
+  const stars = Array.from({length:120},()=>({x:Math.random()*2-1, y:Math.random()*2-1, z:Math.random()}));
+  const flakes = Array.from({length:70},()=>({x:Math.random()*W, y:Math.random()*H, s:.3+Math.random()*1.2, r:1+Math.random()*2}));
+  const media = {};
+  const BARS = ['#C8C8C8','#C8C800','#00C8C8','#00C800','#C800C8','#C80000','#0000C8'];
+
+  function getMedia(t){
+    if(!t.visual) return null;
+    if(media[t.visual]) return media[t.visual];
+    let el;
+    if(/\.(mp4|webm|mov)$/i.test(t.visual)){ el = document.createElement('video'); el.muted=true; el.loop=true; el.playsInline=true; el.src=t.visual; el.play().catch(()=>{}); }
+    else { el = new Image(); el.src = t.visual; }
+    media[t.visual] = el; return el;
+  }
+  function cover(el){
+    const w = el.videoWidth||el.naturalWidth, h = el.videoHeight||el.naturalHeight;
+    if(!w||!h) return;
+    const s = Math.max(W/w, H/h), dw = w*s, dh = h*s;
+    g.drawImage(el, (W-dw)/2, (H-dh)/2, dw, dh);
+  }
+  function bars(){
+    g.globalAlpha = 1;
+    BARS.forEach((c,i)=>{ g.fillStyle = c; g.fillRect(i*W/7, 0, W/7+1, H*.72); });
+    g.fillStyle='#0B0F12'; g.fillRect(0,H*.72,W,H*.28);
+    g.fillStyle='#8FA0A8'; g.font='22px DotGothic16, monospace'; g.textAlign='left';
+    g.fillText('NO DISC', 26, H*.72+52);
+    g.textAlign='right'; g.fillText('SELECT 01–07', W-26, H*.72+52);
+    g.textAlign='left';
+  }
+
+  let t0 = performance.now();
+  function draw(){
+    requestAnimationFrame(draw);
+    const now = performance.now(), ts = (now-t0)/1000;
+    const track = TRACKS[ui.index];
+    if(!ui.loaded || !track){ bars(); return; }
+
+    let energy = .12;
+    if(analyser){ analyser.getByteFrequencyData(freqData); analyser.getByteTimeDomainData(waveData);
+      let s=0; for(let i=0;i<40;i++) s+=freqData[i]; energy = s/40/255; }
+
+    g.fillStyle = 'rgba(5,7,10,'+(reduced?1:.30)+')'; g.fillRect(0,0,W,H);
+    const col = track.c;
+    g.save();
+    g.shadowBlur = 14; g.shadowColor = col; g.strokeStyle = col; g.fillStyle = col;
+    g.lineWidth = 2;
+
+    const el = getMedia(track);
+    if(el && (el.complete || el.readyState>=2)){
+      g.shadowBlur=0; g.globalAlpha=.92; cover(el);
+      g.globalAlpha=.16; g.fillStyle=col; g.fillRect(0,0,W,H); g.globalAlpha=1;
+    } else switch(track.scene){
+      case 0: { // 波形
+        g.beginPath();
+        for(let i=0;i<W;i+=2){
+          const v = waveData ? (waveData[Math.floor(i/W*waveData.length)]-128)/128 : Math.sin(i/40+ts*2)*.2;
+          const y = H/2 + v*H*.34;
+          i?g.lineTo(i,y):g.moveTo(i,y);
+        }
+        g.stroke();
+        g.globalAlpha=.35; g.beginPath(); g.arc(W/2, H/2, 40+energy*90, 0, 7); g.stroke(); g.globalAlpha=1;
+        break; }
+      case 1: { // 地平線グリッド
+        const hz = H*.42;
+        g.globalAlpha=.75;
+        for(let i=0;i<14;i++){
+          const z = ((i/14 + (ts*.18)%(1/14)) % 1);
+          const y = hz + Math.pow(z,2.4)*(H-hz);
+          g.globalAlpha = .12 + z*.6;
+          g.beginPath(); g.moveTo(0,y); g.lineTo(W,y); g.stroke();
+        }
+        g.globalAlpha=.5;
+        for(let i=-8;i<=8;i++){ g.beginPath(); g.moveTo(W/2 + i*26, hz); g.lineTo(W/2 + i*260, H); g.stroke(); }
+        g.globalAlpha=.9; g.beginPath(); g.arc(W/2, hz-10, 34+energy*24, Math.PI, 0); g.fill();
+        g.globalAlpha=1; break; }
+      case 2: { // リサージュ
+        g.beginPath();
+        for(let i=0;i<260;i++){
+          const p = i/260*Math.PI*2;
+          const x = W/2 + Math.sin(p*3 + ts*.6)*(W*.30 + energy*40);
+          const y = H/2 + Math.sin(p*2 + ts*.9)*(H*.30 + energy*40);
+          i?g.lineTo(x,y):g.moveTo(x,y);
+        }
+        g.stroke(); break; }
+      case 3: { // 広がる輪
+        for(let i=0;i<5;i++){
+          const r = ((ts*.35 + i/5) % 1);
+          g.globalAlpha = (1-r)*.85;
+          g.beginPath(); g.arc(W/2, H/2, r*W*.55 + energy*30, 0, 7); g.stroke();
+        }
+        g.globalAlpha=1; break; }
+      case 4: { // 星の中を進む
+        g.shadowBlur=8;
+        stars.forEach(s=>{
+          s.z -= .004 + energy*.02; if(s.z<=.02){ s.z=1; s.x=Math.random()*2-1; s.y=Math.random()*2-1; }
+          const x = W/2 + s.x/s.z*W*.4, y = H/2 + s.y/s.z*H*.4, r = (1-s.z)*2.6;
+          if(x>0&&x<W&&y>0&&y<H){ g.globalAlpha=1-s.z; g.beginPath(); g.arc(x,y,r,0,7); g.fill(); }
+        });
+        g.globalAlpha=1; break; }
+      case 5: { // 降る粒とスペクトラム
+        g.shadowBlur=8;
+        flakes.forEach(f=>{
+          f.y += f.s*(.6+energy*3); f.x += Math.sin((f.y+ts*40)/60)*.4;
+          if(f.y>H){ f.y=-4; f.x=Math.random()*W; }
+          g.globalAlpha=.55; g.beginPath(); g.arc(f.x,f.y,f.r,0,7); g.fill();
+        });
+        g.globalAlpha=.8;
+        for(let i=0;i<32;i++){
+          const v = freqData ? freqData[i*2]/255 : Math.abs(Math.sin(ts+i));
+          g.fillRect(i*(W/32)+3, H - v*H*.32, W/32-6, v*H*.32);
+        }
+        g.globalAlpha=1; break; }
+      default: { // 左右対称のバー
+        const n=24;
+        for(let i=0;i<n;i++){
+          const v = freqData ? freqData[i*3]/255 : Math.abs(Math.sin(ts*2+i*.4))*.6;
+          const h = 8 + v*H*.40, w = W/2/n;
+          g.globalAlpha = .35 + v*.6;
+          g.fillRect(W/2 + i*w + 2, H/2-h/2, w-4, h);
+          g.fillRect(W/2 - (i+1)*w + 2, H/2-h/2, w-4, h);
+        }
+        g.globalAlpha=1; }
+    }
+    g.restore();
+
+    if(!reduced && Math.random()<.03){ // 走査の乱れ
+      const y = Math.random()*H;
+      g.globalAlpha=.12; g.fillStyle='#DFF7EE'; g.fillRect(0,y,W,2+Math.random()*4); g.globalAlpha=1;
+    }
+  }
+  return { draw };
+})();
+
+/* ---------- 7. 操作 ---------- */
+function wire(){
+  $('#btnPlay').addEventListener('click', ()=>{ initAudio(); if(AC.state==='suspended') AC.resume(); ui.toggle(); });
+  $('#btnPrev').addEventListener('click', ()=> ui.skip(-1));
+  $('#btnNext').addEventListener('click', ()=> ui.skip(1));
+  $('#btnEject').addEventListener('click', ()=> ui.eject());
+  $('#vol').addEventListener('input', ()=>{ if(master) master.gain.value = volOf(); });
+
+  // 早送り・巻き戻し：押しっぱなしで走る、単押しで10秒
+  [['#btnFf',1],['#btnRew',-1]].forEach(([sel,dir])=>{
+    const b = $(sel); let hold=null, run=null, scrubbing=false;
+    const start = e => {
+      e.preventDefault(); if(b.disabled) return;
+      scrubbing = false;
+      hold = setTimeout(()=>{ scrubbing = true; run = setInterval(()=> audio.seek(audio.position() + dir*.6), 55); }, 300);
+    };
+    const end = () => {
+      clearTimeout(hold); clearInterval(run); run=null;
+      if(!scrubbing && !b.disabled) audio.seek(audio.position() + dir*10);
+      scrubbing = false;
+    };
+    b.addEventListener('pointerdown', start);
+    ['pointerup','pointerleave','pointercancel'].forEach(ev=> b.addEventListener(ev, ()=>{ if(hold||run) end(); }));
+  });
+
+  // シーク
+  const seek = $('#seek');
+  const setFromEvent = e => {
+    const r = seek.getBoundingClientRect();
+    audio.seek(clamp((e.clientX - r.left)/r.width, 0, 1) * (audio.dur||1));
+  };
+  let dragging = false;
+  seek.addEventListener('pointerdown', e=>{ if(!ui.loaded) return; dragging=true; seek.setPointerCapture(e.pointerId); setFromEvent(e); });
+  seek.addEventListener('pointermove', e=>{ if(dragging) setFromEvent(e); });
+  ['pointerup','pointercancel'].forEach(ev=> seek.addEventListener(ev, ()=> dragging=false));
+  seek.addEventListener('keydown', e=>{
+    if(!ui.loaded) return;
+    if(e.key==='ArrowRight'){ audio.seek(audio.position()+5); e.preventDefault(); }
+    if(e.key==='ArrowLeft'){ audio.seek(audio.position()-5); e.preventDefault(); }
+  });
+
+  // キーボード
+  addEventListener('keydown', e=>{
+    if(e.target.matches('input,[role=slider]')) return;
+    if(e.code==='Space'){ e.preventDefault(); initAudio(); if(AC.state==='suspended') AC.resume(); ui.toggle(); }
+    if(e.key==='ArrowRight' && e.shiftKey) ui.skip(1);
+    if(e.key==='ArrowLeft' && e.shiftKey) ui.skip(-1);
+    if(/^[1-7]$/.test(e.key)){ const i=+e.key-1; ui.select(i, document.querySelectorAll('.slot')[i]); }
+  });
+}
+
+/* ---------- 8. 起動 ---------- */
+ui.build(); wire(); ui.paint();
+(function loop(){ ui.tick(); requestAnimationFrame(loop); })();
+crt.draw();
+</script>
