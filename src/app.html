@@ -832,7 +832,16 @@ const ui = {
     requestAnimationFrame(()=>{
       fly.style.transform = `translate(${tx}px, ${ty}px) scale(${size/a.width}) rotate(200deg)`;
     });
-    this.flightTimer = setTimeout(()=>{ this.flyer = null; fly.remove(); put(); }, 700);
+    // 着地は「動きが終わった」合図で決める。時計で決めると、端末が忙しくて
+    // 動きが遅れたときに空中で消える。合図が来ない場合に備えて予備の時計も置く。
+    let landed = false;
+    const land = ()=>{
+      if(landed) return; landed = true;
+      clearTimeout(this.flightTimer); this.flightTimer = null;
+      this.flyer = null; fly.remove(); put();
+    };
+    fly.addEventListener('transitionend', e => { if(e.propertyName === 'transform') land(); });
+    this.flightTimer = setTimeout(land, 1200);
   },
 
   eject(){
