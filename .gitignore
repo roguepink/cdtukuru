@@ -1,5 +1,2 @@
 node_modules/
 .DS_Store
-assets/audio/*.mp3
-assets/audio/*.m4a
-assets/audio/*.wav

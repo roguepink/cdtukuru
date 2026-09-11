@@ -286,7 +286,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .lyrics p.past{color:rgba(30,27,21,.5)}
 .lyrics p.now{color:#1E1B15; font-weight:600}
 .lyrics p.now::before{content:"▍"; color:#9A5C4B; margin-left:-.85em; margin-right:.15em}
-.lyrics p.br{height:.5em}
+.lyrics p.br{height:.55em}
+.lyrics p.sec{
+  font-family:var(--label); font-weight:600; font-size:9.5px; letter-spacing:.2em; text-transform:uppercase;
+  color:#9A5C4B; line-height:1.9; margin-top:.35em;
+}
 .bk-foot{margin-top:14px; padding-top:11px; border-top:1px solid rgba(30,27,21,.18); font-size:11.5px; color:#6A6152; line-height:1.65}
 
 /* ---------- 仕様メモ ---------- */
@@ -322,7 +326,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <h1>七枚の同じ歌</h1>
       <p class="sub">おなじ歌詞を、七通りの旋律で。ディスクを選んで、デッキに入れてください。</p>
     </div>
-    <span class="stamp">試作 v0.1 / 音は仮</span>
+    <span class="stamp" id="stamp">試作 v0.2 / 音源あり</span>
   </header>
 
   <div class="stack">
@@ -405,21 +409,21 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <aside class="booklet" aria-label="歌詞カード">
     <div class="bk-head">
       <span class="silk">Lyrics</span>
-      <span class="tag">仮歌詞</span>
+      <span class="tag">七曲共通</span>
     </div>
     <div class="lyrics" id="lyrics"></div>
-    <p class="bk-foot">七枚とも歌詞は同じ。旋律だけが変わります。<br>本番の歌詞は <code>LYRICS</code> を差し替えるだけで反映されます。</p>
+    <p class="bk-foot">七枚とも歌詞は同じ。旋律だけが変わります。<br>行の送りは尺に合わせた自動送りです（秒単位で合わせることもできます）。</p>
   </aside>
 
   <section class="spec">
     <h2>差し替えの手順 — Handover</h2>
     <dl>
       <dt>音源</dt>
-      <dd><code>assets/audio/01.mp3</code> 〜 <code>07.mp3</code> を置き、<code>TRACKS</code> の <code>src</code> に書くだけ。いま鳴っているのは仮のデモ音（自動生成）です。</dd>
+      <dd>七曲とも <code>assets/audio/01.mp3</code> 〜 <code>07.mp3</code> として収録済み。差し替えは同じ名前で上書きするだけ。読み込めない環境では仮のデモ音に自動で切り替わります。</dd>
     </dl>
     <dl>
       <dt>歌詞</dt>
-      <dd>七曲共通なので <code>LYRICS</code> に一度書くだけ。空行は <code>""</code> で入れます。行の送りは尺に合わせて自動、<code>cues</code> を書けば手動同期。</dd>
+      <dd>七曲共通なので <code>LYRICS</code> に一度書くだけ。<code>[Chorus]</code> のような角括弧はセクション見出しに、<code>""</code> は空行になります。行送りは自動、<code>cues</code> に秒数を並べれば手動同期。</dd>
     </dl>
     <dl>
       <dt>ブラウン管の映像</dt>
@@ -440,37 +444,80 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 /* ---------- 1. 曲の設定（差し替えポイント） ---------- */
 const TRACKS = [
-  { n:'01', title:'あさやけ',   tag:'MORNING PIANO', c:'#FFC46B', dur:204, scene:0,
-    src:null, visual:null, demo:{bpm:76,  root:60, minor:false, prog:[0,5,3,4], wave:'triangle', mel:[0,2,4,7,4,2,null,0, 4,5,7,9,7,4,2,null], dly:.34} },
-  { n:'02', title:'まちあわせ', tag:'CITY POP',      c:'#7FB8FF', dur:238, scene:1,
-    src:null, visual:null, demo:{bpm:104, root:62, minor:false, prog:[1,4,0,5], wave:'sawtooth', mel:[7,null,7,9,11,9,7,4, 5,null,5,7,9,7,5,2], dly:.26} },
-  { n:'03', title:'ひるさがり', tag:'BOSSA',         c:'#C8F06B', dur:192, scene:2,
-    src:null, visual:null, demo:{bpm:92,  root:57, minor:true,  prog:[0,3,4,3], wave:'sine',     mel:[4,5,7,null,9,7,5,4, 2,4,5,null,7,5,4,2], dly:.30} },
-  { n:'04', title:'ゆうなぎ',   tag:'BALLAD',        c:'#FF8FA8', dur:246, scene:3,
-    src:null, visual:null, demo:{bpm:66,  root:55, minor:false, prog:[0,4,5,3], wave:'triangle', mel:[0,null,4,null,7,null,9,null, 7,null,5,null,4,null,2,null], dly:.42} },
-  { n:'05', title:'よみち',     tag:'SYNTH WAVE',    c:'#A98CFF', dur:220, scene:4,
-    src:null, visual:null, demo:{bpm:118, root:59, minor:true,  prog:[0,5,3,4], wave:'square',   mel:[0,0,7,0,5,0,4,0, 2,2,7,2,4,2,0,null], dly:.22} },
-  { n:'06', title:'ほしぞら',   tag:'MUSIC BOX',     c:'#7CF2C8', dur:178, scene:5,
-    src:null, visual:null, demo:{bpm:84,  root:72, minor:false, prog:[0,3,4,0], wave:'sine',     mel:[7,9,11,9,7,4,null,2, 4,7,9,7,4,2,null,0], dly:.38} },
-  { n:'07', title:'あさになる', tag:'ACOUSTIC',      c:'#FF7A4A', dur:262, scene:6,
-    src:null, visual:null, demo:{bpm:72,  root:64, minor:false, prog:[0,4,3,5], wave:'triangle', mel:[0,2,4,null,5,4,2,0, 4,2,0,null,-3,0,2,null], dly:.36} },
+  { n:'01', title:'その一', tag:'TAKE 1', c:'#FFC46B', dur:254, scene:0,
+    src:'assets/audio/01.mp3', visual:null,
+    demo:{bpm:76,  root:60, minor:false, wave:'triangle', mel:[0,2,4,7,4,2,null,0, 4,5,7,9,7,4,2,null], prog:[0,5,3,4], dly:.34} },
+  { n:'02', title:'その二', tag:'TAKE 2', c:'#7FB8FF', dur:234, scene:1,
+    src:'assets/audio/02.mp3', visual:null,
+    demo:{bpm:104, root:62, minor:false, wave:'sawtooth', mel:[7,null,7,9,11,9,7,4, 5,null,5,7,9,7,5,2], prog:[1,4,0,5], dly:.26} },
+  { n:'03', title:'その三', tag:'TAKE 3', c:'#C8F06B', dur:238, scene:2,
+    src:'assets/audio/03.mp3', visual:null,
+    demo:{bpm:92,  root:57, minor:true,  wave:'sine',     mel:[4,5,7,null,9,7,5,4, 2,4,5,null,7,5,4,2], prog:[0,3,4,3], dly:.30} },
+  { n:'04', title:'その四', tag:'TAKE 4', c:'#FF8FA8', dur:208, scene:3,
+    src:'assets/audio/04.mp3', visual:null,
+    demo:{bpm:66,  root:55, minor:false, wave:'triangle', mel:[0,null,4,null,7,null,9,null, 7,null,5,null,4,null,2,null], prog:[0,4,5,3], dly:.42} },
+  { n:'05', title:'その五', tag:'TAKE 5', c:'#A98CFF', dur:241, scene:4,
+    src:'assets/audio/05.mp3', visual:null,
+    demo:{bpm:118, root:59, minor:true,  wave:'square',   mel:[0,0,7,0,5,0,4,0, 2,2,7,2,4,2,0,null], prog:[0,5,3,4], dly:.22} },
+  { n:'06', title:'その六', tag:'TAKE 6', c:'#7CF2C8', dur:176, scene:5,
+    src:'assets/audio/06.mp3', visual:null,
+    demo:{bpm:84,  root:72, minor:false, wave:'sine',     mel:[7,9,11,9,7,4,null,2, 4,7,9,7,4,2,null,0], prog:[0,3,4,0], dly:.38} },
+  { n:'07', title:'その七', tag:'TAKE 7', c:'#FF7A4A', dur:254, scene:6,
+    src:'assets/audio/07.mp3', visual:null,
+    demo:{bpm:72,  root:64, minor:false, wave:'triangle', mel:[0,2,4,null,5,4,2,0, 4,2,0,null,-3,0,2,null], prog:[0,4,3,5], dly:.36} },
 ];
 
 /* ---------- 2. 歌詞（七曲共通・差し替えポイント） ---------- */
 const LYRICS = [
-  'なんでもない日の 帰り道で',
-  'きみが笑った それだけのこと',
+  '[Intro]',
+  '(Ooh, yeah... hmm)',
+  '懐かしいあの日のeveryday life',
+  '時を超えて見つけたChapter',
+  '心から、おめでとう',
   '',
-  'おなじ空を 何度も見上げて',
-  'おなじ言葉を 違う声で言う',
+  '[Verse 1]',
+  '同じチャイムを聞いて過ごした',
+  'あの眩しい青い春の教室',
+  '当時はまだ すれ違うだけの',
+  '名前も知らない 遠い存在だったね',
   '',
-  'ひとつの詞に 七つの旋律',
-  'どれがすきかは きみが決めて',
+  '[Verse 2]',
+  'あれから僕ら それぞれの道を歩み',
+  'たくさんの経験を重ねてきた',
+  '大人になって 久しぶりに集まった',
+  '懐かしい仲間の輪に 二人がいた',
   '',
-  '朝が来るまで 鳴らしていて',
-  'この歌はもう きみのものだから',
+  '[Chorus]',
+  'いくつもの季節を 遠回りしたけれど',
+  '運命の糸が 静かに手繰り寄せた',
+  '重ねてきた日々が 確かな強さになり',
+  '優しく紡がれる 二人の純愛',
+  '心からの「おめでとう」を君たちに',
   '',
-  'また会う日まで しまっておいて',
+  '[Verse 3]',
+  '飾らない笑顔で 寄り添い合う姿',
+  '見守る僕らまで 温かい気持ちになる',
+  '雨の日だって 二人で分け合えば',
+  '静かに輝く 虹に変わるから',
+  '',
+  '[Bridge]',
+  'これから始まる 新しいストーリー',
+  'どんな未来も 手を繋いで歩いていこう',
+  'あの頃の仲間は いつでもここにいる',
+  'いつだって二人の味方だから',
+  '',
+  '[Chorus]',
+  'いくつもの季節を 遠回りしたけれど',
+  '運命の糸が 静かに手繰り寄せた',
+  '重ねてきた日々が 確かな強さになり',
+  '優しく紡がれる 二人の純愛',
+  '心からの「おめでとう」を君たちに',
+  '',
+  '[Outro]',
+  '世界で一番 幸せになってね',
+  '本当におめでとう',
+  'いつまでもお幸せに',
+  '(Yeah, forever love... fade out)',
 ];
 
 /* ---------- 3. 小道具 ---------- */
@@ -512,20 +559,40 @@ const audio = {
       this.mode='file';
       initAudio();
       const el = new Audio(track.src); el.preload='metadata';
-      el.addEventListener('loadedmetadata', ()=>{ if(isFinite(el.duration)) { this.dur=el.duration; ui.paint(); } });
+      el.addEventListener('loadedmetadata', ()=>{ if(isFinite(el.duration)) { this.dur=el.duration; ui.paint(); } ui.stamp(true); });
       el.addEventListener('ended', ()=> ui.trackEnded());
-      try{ elSrc = AC.createMediaElementSource(el); elSrc.connect(master); elSrc.connect(this.delay); }catch(e){}
-      this.el = el;
+      el.addEventListener('error', ()=> this.demote(track));
+      this.el = el; this.tapped = false;
     } else {
       this.mode='synth'; this.d = track.demo;
     }
+  },
+  demote(track){                       // 音源が使えないとき、仮のデモ音へ静かに切り替える
+    if(this.t !== track || this.mode === 'synth') return;
+    const was = this.playing;
+    this.mode='synth'; this.d = track.demo; this.dur = track.dur; this.el = null; this.pos = 0;
+    ui.stamp(false);
+    if(was){ this.playing = false; this.play(); }
+    ui.paint();
   },
   play(){
     if(!this.t) return;
     initAudio(); if(AC.state==='suspended') AC.resume();
     master.gain.value = volOf();
     this.playing = true;
-    if(this.mode==='file'){ this.el.currentTime = this.pos; this.el.play().catch(()=>{}); }
+    if(this.mode==='file'){
+      this.el.currentTime = this.pos; this.el.play().catch(()=>{});
+      // 解析器への分岐は、音声コンテキストが確実に動いてから繋ぐ
+      // （繋いだあとは素の再生経路に戻せないため、先に生存確認する）
+      const el = this.el, from = this.pos, track = this.t;
+      setTimeout(()=>{                 // 数秒たっても頭出しが進まなければ音源が無いとみなす
+        if(this.el === el && this.playing && el.readyState < 2 && el.currentTime <= from + .01) this.demote(track);
+      }, 3500);
+      Promise.resolve(AC.resume()).catch(()=>{}).then(()=>{
+        if(this.el !== el || this.tapped || AC.state !== 'running') return;
+        try{ elSrc = AC.createMediaElementSource(el); elSrc.connect(master); elSrc.connect(this.delay); this.tapped = true; }catch(e){}
+      });
+    }
     else{ this.delay.delayTime.value = this.d.dly; this.startSched(); }
   },
   pause(){
@@ -585,6 +652,16 @@ const audio = {
   }
 };
 
+/* 解析器に実信号が来ているか。来ていなければ時間から擬似的な動きを作る */
+function levels(){
+  if(!analyser) return {live:false, energy:.2};
+  analyser.getByteFrequencyData(freqData);
+  let sum = 0; for(let i=0;i<48;i++) sum += freqData[i];
+  if(sum > 0){ analyser.getByteTimeDomainData(waveData); return {live:true, energy:sum/48/255}; }
+  const ts = performance.now()/1000;
+  return {live:false, energy: audio.playing ? .22 + .16*Math.sin(ts*1.7) + .1*Math.sin(ts*3.3) : .04};
+}
+
 /* ---------- 5. 画面の状態 ---------- */
 const ui = {
   index:-1, loaded:false, lines:[], curLine:-1,
@@ -603,7 +680,9 @@ const ui = {
     const wrap = $('#lyrics');
     LYRICS.forEach(l=>{
       const p = document.createElement('p');
-      if(l===''){ p.className='br'; } else { p.textContent = l; this.lines.push(p); }
+      if(l===''){ p.className='br'; }
+      else if(/^\[.*\]$/.test(l)){ p.className='sec'; p.textContent = l.slice(1,-1); }
+      else { p.textContent = l; this.lines.push(p); }
       wrap.appendChild(p);
     });
     const m = $('#meter');
@@ -689,6 +768,13 @@ const ui = {
     if(d) d.classList.toggle('spinning', true), d.classList.toggle('paused', !playing);
   },
 
+  stamp(real){
+    const el = $('#stamp');
+    el.textContent = real ? '試作 v0.2 / 音源あり' : '試作 v0.2 / 音は仮';
+    el.style.color = real ? 'var(--vfd)' : 'var(--signal)';
+    el.style.borderColor = real ? 'rgba(124,242,200,.45)' : 'rgba(226,80,58,.45)';
+  },
+
   setLine(i){
     if(i === this.curLine) return;
     this.curLine = i;
@@ -717,18 +803,18 @@ const ui = {
       let idx = -1;
       if(t.cues){ for(let i=0;i<t.cues.length;i++) if(pos >= t.cues[i]) idx = i; }
       else{
-        const intro = dur*.09, span = dur*.80;
+        const intro = dur*.05, span = dur*.87;
         idx = pos < intro ? -1 : Math.min(this.lines.length-1, Math.floor((pos-intro)/(span/this.lines.length)));
       }
       this.setLine(idx);
     }
     // レベルメーター
     if(analyser){
-      analyser.getByteFrequencyData(freqData);
-      const bars = $('#meter').children;
+      const lv = levels(), bars = $('#meter').children, ts = performance.now()/1000;
       for(let i=0;i<bars.length;i++){
-        const v = freqData[2 + i*3] / 255;
-        bars[i].style.height = (4 + v*10).toFixed(1)+'px';
+        const v = lv.live ? freqData[2 + i*3]/255
+                          : audio.playing ? (.25 + .22*Math.sin(ts*5.5 - i*.6) + .12*Math.sin(ts*2.1 + i)) : 0;
+        bars[i].style.height = (4 + clamp(v,0,1)*10).toFixed(1)+'px';
         bars[i].classList.toggle('on', audio.playing && v > .06);
       }
     }
@@ -774,9 +860,9 @@ const crt = (()=>{
     const track = TRACKS[ui.index];
     if(!ui.loaded || !track){ bars(); return; }
 
-    let energy = .12;
-    if(analyser){ analyser.getByteFrequencyData(freqData); analyser.getByteTimeDomainData(waveData);
-      let s=0; for(let i=0;i<40;i++) s+=freqData[i]; energy = s/40/255; }
+    const lv = levels(), energy = lv.energy, live = lv.live;
+    const band = i => live ? freqData[i]/255
+                           : Math.abs(Math.sin(ts*1.9 + i*.5)) * (.35 + .45*Math.abs(Math.sin(ts*.7 + i*.2)));
 
     g.fillStyle = 'rgba(5,7,10,'+(reduced?1:.30)+')'; g.fillRect(0,0,W,H);
     const col = track.c;
@@ -792,7 +878,8 @@ const crt = (()=>{
       case 0: { // 波形
         g.beginPath();
         for(let i=0;i<W;i+=2){
-          const v = waveData ? (waveData[Math.floor(i/W*waveData.length)]-128)/128 : Math.sin(i/40+ts*2)*.2;
+          const v = live ? (waveData[Math.floor(i/W*waveData.length)]-128)/128
+                         : (Math.sin(i/34 + ts*3.1)*.34 + Math.sin(i/11 - ts*5.2)*.14) * (.5+energy);
           const y = H/2 + v*H*.34;
           i?g.lineTo(i,y):g.moveTo(i,y);
         }
@@ -845,14 +932,14 @@ const crt = (()=>{
         });
         g.globalAlpha=.8;
         for(let i=0;i<32;i++){
-          const v = freqData ? freqData[i*2]/255 : Math.abs(Math.sin(ts+i));
+          const v = band(i*2);
           g.fillRect(i*(W/32)+3, H - v*H*.32, W/32-6, v*H*.32);
         }
         g.globalAlpha=1; break; }
       default: { // 左右対称のバー
         const n=24;
         for(let i=0;i<n;i++){
-          const v = freqData ? freqData[i*3]/255 : Math.abs(Math.sin(ts*2+i*.4))*.6;
+          const v = band(i*3);
           const h = 8 + v*H*.40, w = W/2/n;
           g.globalAlpha = .35 + v*.6;
           g.fillRect(W/2 + i*w + 2, H/2-h/2, w-4, h);
