@@ -550,7 +550,7 @@ const IOS = /iP(hone|od|ad)/.test(navigator.platform) ||
 let EL = null;
 
 const audio = {
-  mode:'synth', el:null, delay:null, tapped:false, watchdog:null, blocked:{},
+  mode:'synth', el:null, delay:null, tapped:false, watchdog:null, needsReload:false,
   timer:null, step:0, nextTime:0, startCtx:0, startPos:0, playing:false, pos:0, dur:0, t:null,
 
   /* 七曲で一つの音声要素を共有する。一度鳴らせば以後は解禁済みなので、
@@ -567,9 +567,11 @@ const audio = {
       if(this.pos > 0){ try{ EL.currentTime = this.pos; }catch(e){} }
       ui.stamp(true); ui.paint();
     });
-    EL.addEventListener('playing', () => { clear(); ui.unblock(); });
+    EL.addEventListener('playing', () => { clear(); ui.clearNotice(true); });
+    EL.addEventListener('canplay', () => ui.clearNotice(false));
+    EL.addEventListener('waiting', () => { if(this.playing) ui.notice('よみこみ中…', false); });
     EL.addEventListener('ended', () => ui.trackEnded());
-    EL.addEventListener('error', () => this.demote(this.t));
+    EL.addEventListener('error', () => { if(EL.error) this.fail(this.t); });
     return EL;
   },
 
@@ -577,7 +579,7 @@ const audio = {
     this.stopSched();
     clearTimeout(this.watchdog); this.watchdog = null;
     this.playing = false; this.pos = 0; this.t = track; this.dur = track.dur || 180;
-    if(track.src && !this.blocked[track.n]){
+    if(track.src){
       this.mode = 'file';
       const el = this.element();
       el.pause();
@@ -592,38 +594,44 @@ const audio = {
     }
   },
 
-  demote(track){                       // 音源が使えないとき、仮のデモ音へ静かに切り替える
-    if(!track || this.t !== track || this.mode === 'synth') return;
+  /* 音源が取れなかったとき。黙って別の音に差し替えると気づけないので、
+     はっきり伝えて、もう一度押せば取り直す。 */
+  fail(track){
+    if(!track || this.t !== track || this.mode !== 'file') return;
     clearTimeout(this.watchdog); this.watchdog = null;
-    const was = this.playing;
-    this.blocked[track.n] = true;      // 一度だめだった曲は繰り返し試さない
-    this.mode = 'synth'; this.d = track.demo; this.dur = track.dur; this.pos = 0;
+    this.playing = false; this.needsReload = true;
     if(EL) EL.pause();
-    this.el = null;
-    ui.stamp(false);
-    if(was){ this.playing = false; this.play(); }
-    ui.paint();
+    ui.notice('よみこめません　▶ もういちど', true);
+  },
+  reload(){                            // 取り直す。途中で壊れた分を掴まないよう別名で取る
+    const t = this.t; if(!t || !t.src) return;
+    this.needsReload = false;
+    const el = this.element();
+    el.src = t.src + '?r=' + Date.now();
+    this.pos = 0;
   },
 
   play(){
     if(!this.t) return;
     this.playing = true;
     if(this.mode === 'file'){
+      if(this.needsReload) this.reload();
       if(!IOS){ initAudio(); if(AC.state === 'suspended') AC.resume(); mediaGain.gain.value = volOf(); }
       const el = this.el, track = this.t;
       if(el.readyState > 0 && Math.abs(el.currentTime - this.pos) > .3){
         try{ el.currentTime = this.pos; }catch(e){}
       }
-      el.play().then(() => ui.unblock()).catch(err => {
+      el.play().then(() => ui.clearNotice(true)).catch(err => {
         // iOS が操作由来でないと判断した場合ここに来る。無音のまま放置せず伝える。
         if(err && err.name === 'NotAllowedError') ui.blocked();
       });
-      // 読み込みが全く始まらないときだけ仮の音へ。回線が遅いだけの場合に
-      // 誤って切り替えないよう、十分待ってから readyState を見る。
+      // 回線が遅いだけの場合と、本当に取れない場合を取り違えないよう、
+      // 失敗の印（error か「音源なし」）が立っているときだけ知らせる。
       clearTimeout(this.watchdog);
       this.watchdog = setTimeout(() => {
-        if(this.mode === 'file' && this.t === track && el.readyState === 0) this.demote(track);
-      }, 12000);
+        if(this.t !== track || this.mode !== 'file') return;
+        if(el.error || el.networkState === 3) this.fail(track);
+      }, 15000);
       // 解析器へ分岐すると iOS ではマナースイッチで消音されるため、iOS では繋がない。
       // 繋いだあとは素の再生経路へ戻せないので、他の環境でも生存確認してから。
       if(!IOS && !this.tapped){
@@ -754,6 +762,8 @@ const ui = {
     const wasLoaded = this.loaded;
     this.index = i; const t = TRACKS[i];
     document.querySelectorAll('.slot').forEach((s,j)=> s.setAttribute('aria-current', j===i ? 'true':'false'));
+    this.msg = null; this.needsTap = false;
+    $('#btnPlay').classList.remove('attn');
     audio.load(t);
     this.loaded = true;
     audio.play();                 // 指で触れたその拍で鳴らす。遅らせると iOS で無音になる
@@ -819,7 +829,7 @@ const ui = {
     $('#btnPlay').setAttribute('aria-label', playing ? '一時停止' : '再生');
     $('#vfdMode').textContent = !this.loaded ? '■ STOP' : playing ? '▶ PLAY' : '❚❚ PAUSE';
     $('#vfdTrack').textContent = t ? 'TRACK '+t.n : 'TRACK --';
-    if(!this.needsTap) $('#vfdTitle').textContent = t ? t.title + '  —  ' + t.tag : 'ディスクを えらんでください';
+    if(!this.msg) $('#vfdTitle').textContent = t ? t.title + '  —  ' + t.tag : 'ディスクを えらんでください';
     $('#vfdTotal').textContent = mmss(audio.dur || 0);
     $('#osdCh').textContent = t ? 'CH '+t.n : 'CH --';
     $('#osdMode').textContent = !this.loaded ? 'STANDBY' : playing ? '▶ PLAY' : '❚❚ PAUSE';
@@ -829,20 +839,22 @@ const ui = {
     if(d) d.classList.toggle('spinning', true), d.classList.toggle('paused', !playing);
   },
 
-  /* 再生が拒まれたときの案内。再生ボタンを光らせ、表示管で伝える */
-  blocked(){
-    if(this.needsTap) return;
-    this.needsTap = true;
-    $('#btnPlay').classList.add('attn');
-    $('#vfdTitle').textContent = '▶ ボタンを おしてください';
-    audio.playing = false; this.paint();
+  /* 表示管に出す知らせ。tap=true なら再生ボタンを光らせ、押してもらう */
+  notice(msg, tap){
+    if(this.msg === msg) return;
+    this.msg = msg; this.needsTap = !!tap;
+    $('#btnPlay').classList.toggle('attn', !!tap);
+    $('#vfdTitle').textContent = msg;
+    if(tap) audio.playing = false;
+    this.paint();
   },
-  unblock(){
-    if(!this.needsTap) return;
-    this.needsTap = false;
+  clearNotice(force){
+    if(!this.msg || (this.needsTap && !force)) return;
+    this.msg = null; this.needsTap = false;
     $('#btnPlay').classList.remove('attn');
     this.paint();
   },
+  blocked(){ this.notice('▶ ボタンを おしてください', true); },
 
   stamp(real){
     const el = $('#stamp');                       // 制作中だけ置く印。本番の画面には無い
