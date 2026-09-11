@@ -63,7 +63,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   font-family:var(--serif); font-weight:600; font-size:clamp(23px,3.4vw,32px);
   margin:0; letter-spacing:.08em; text-wrap:balance;
 }
-.masthead .sub{margin:0; color:var(--ink-dim); font-size:13px; max-width:46ch}
+.masthead .sub{margin:0; color:var(--ink-dim); font-size:13px; max-width:60ch}
+.masthead .sub span{display:inline-block}
+.masthead .to{margin:0 0 4px; font-family:var(--serif); font-size:15px; letter-spacing:.12em; color:var(--ink-dim)}
+.masthead .to[hidden]{display:none}
 .stack{display:grid; gap:20px; min-width:0}
 
 /* ---------- 共通：機材の面 ---------- */
@@ -215,6 +218,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* シークバー */
 .seek{position:relative; height:34px; display:flex; align-items:center; cursor:pointer; touch-action:none}
 .seek .track{position:relative; width:100%; height:6px; border-radius:3px; background:rgba(0,0,0,.42); box-shadow:0 1px 0 rgba(255,255,255,.22)}
+.seek .buf{position:absolute; inset:0 auto 0 0; width:0%; border-radius:3px; background:rgba(124,242,200,.16)}
 .seek .fill{position:absolute; inset:0 auto 0 0; width:0%; border-radius:3px; background:linear-gradient(90deg,#3E7F6C,var(--vfd)); box-shadow:0 0 8px rgba(124,242,200,.5)}
 .seek .head{position:absolute; top:50%; left:0; width:15px; height:15px; margin:-7.5px 0 0 -7.5px; border-radius:50%; background:#EFE9DA; box-shadow:0 1px 3px rgba(0,0,0,.7)}
 
@@ -255,7 +259,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .rack-head{display:flex; align-items:center; gap:10px; margin-bottom:13px}
 .rack-head .silk{color:var(--ink-dim)}
 .rack-head .rule{flex:1; height:1px; background:var(--hair)}
-.shelf{display:grid; gap:10px; grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+.shelf{display:grid; gap:8px; grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
 .slot{
   display:grid; gap:8px; justify-items:center; padding:9px 7px 10px; border-radius:var(--r-sm);
   background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
@@ -265,8 +269,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .slot:hover{transform:translateY(-4px); border-color:rgba(255,255,255,.16); background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.02))}
 .slot .disc{width:70px; height:70px; transition:transform .18s ease}
 .slot:hover .disc{transform:rotate(-8deg)}
+.slot:active{transform:translateY(0) scale(.97)}
 .slot .nm{font-family:var(--body); font-size:12px; line-height:1.35; color:var(--ink)}
-.slot .dur{font-family:var(--pixel); font-size:10.5px; color:var(--ink-faint); letter-spacing:.06em}
+.slot .dur{font-family:var(--pixel); font-size:10.5px; color:var(--ink-dim); letter-spacing:.06em}
 .slot[aria-current="true"]{border-color:var(--c); background:var(--c-soft)}
 .slot[aria-current="true"] .nm{color:var(--c)}
 .flyer{position:fixed; z-index:60; pointer-events:none; transition:transform .68s cubic-bezier(.5,.02,.2,1), opacity .68s ease}
@@ -328,8 +333,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <div class="room">
   <header class="masthead">
     <div>
+      <p class="to" id="dedication" hidden></p>
       <h1>7つの扉</h1>
-      <p class="sub">おなじ歌詞を、七通りの旋律で。ディスクを選んで、デッキに入れてください。</p>
+      <p class="sub"><span>おなじ歌詞を、七通りの旋律で。</span> <span>ディスクを選んで、デッキに入れてください。</span></p>
     </div>
   </header>
 
@@ -371,7 +377,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           <div class="row1">
             <span class="mode" id="vfdMode">■ STOP</span>
             <span id="vfdTrack" class="dim">TRACK --</span>
-            <span id="vfdRepeat" class="dim">ALL</span>
+            <span id="vfdRepeat" class="dim"></span>
           </div>
           <div class="title" id="vfdTitle">ディスクを えらんでください</div>
           <div class="row3">
@@ -383,7 +389,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
         </div>
 
         <div class="seek" id="seek" role="slider" tabindex="0" aria-label="再生位置" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-          <span class="track"><span class="fill" id="seekFill"></span><span class="head" id="seekHead"></span></span>
+          <span class="track"><span class="buf" id="seekBuf"></span><span class="fill" id="seekFill"></span><span class="head" id="seekHead"></span></span>
         </div>
 
         <div class="transport">
@@ -401,9 +407,9 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <!-- ディスクラック -->
     <section class="rack" aria-label="ディスク棚">
       <div class="rack-head">
-        <span class="silk">Disc Library &nbsp;/&nbsp; 7 Discs, One Lyric</span>
+        <span class="silk">Disc Library</span>
         <span class="rule"></span>
-        <span class="silk" id="rackHint">Tap to load</span>
+        <span class="silk" id="rackHint">タップして いれる</span>
       </div>
       <div class="shelf" id="shelf"></div>
     </section>
@@ -504,6 +510,14 @@ const LYRICS = [
   'いつまでもお幸せに',
   '(Yeah, forever love... fade out)',
 ];
+
+/* ---------- 2b. 贈り物の設定 ---------- */
+const GIFT = {
+  to:   '',                            // 例: 'ゆうき と さき へ'。空なら出さない
+  from: '',                            // 例: '同級生一同より'
+  idleVisual: 'assets/visuals/07.jpg', // 何も入っていないときテレビに映す絵
+  endAfterLast: true,                  // 最後の曲のあと、最初に戻らず締める
+};
 
 /* ---------- 3. 小道具 ---------- */
 const $ = s => document.querySelector(s);
@@ -733,7 +747,7 @@ const ui = {
       b.style.setProperty('--c-soft', softColor(t.c));
       b.setAttribute('aria-current','false');
       b.innerHTML = `<span class="disc" style="--c:${t.c}"><span class="label"><span class="n">${t.n}</span></span></span>
-        <span class="nm">${t.title}</span><span class="dur">${t.tag} · ${mmss(t.dur)}</span>`;
+        <span class="nm">${t.title}</span><span class="dur">${mmss(t.dur)}</span>`;
       b.addEventListener('click', ()=> this.select(i, b));
       shelf.appendChild(b);
     });
@@ -747,6 +761,11 @@ const ui = {
     });
     const m = $('#meter');
     for(let i=0;i<14;i++) m.appendChild(document.createElement('i'));
+    if(GIFT.to){
+      const d = $('#dedication');
+      d.textContent = GIFT.to + (GIFT.from ? '　—　' + GIFT.from : '');
+      d.hidden = false;
+    }
     // 手でスクロールしたことを覚えておく（自動追従はそのあいだ止める）
     this.touchedAt = -1e9;
     const box = $('#lyrics');
@@ -767,8 +786,19 @@ const ui = {
     audio.load(t);
     this.loaded = true;
     audio.play();                 // 指で触れたその拍で鳴らす。遅らせると iOS で無音になる
+    this.reveal();
+    crt.flash(wasLoaded ? 260 : 380);
     this.insertDisc(btn, wasLoaded);
     this.paint();
+  },
+
+  /* 見せ場（テレビとデッキ）が画面外なら、そこまで戻す。
+     ディスクは画面の下から飛んでくることになり、それ自体が演出になる。 */
+  reveal(){
+    const r = $('#chamber').getBoundingClientRect();
+    if(r.top >= 0 && r.bottom <= innerHeight) return;
+    const top = $('.tv').getBoundingClientRect().top + scrollY - 10;
+    scrollTo({top: Math.max(0, top), behavior:'auto'});
   },
 
   /* ディスクが棚からデッキへ飛んでいく */
@@ -803,6 +833,7 @@ const ui = {
   eject(){
     if(!this.loaded) return;
     audio.pause(); audio.pos = 0;
+    crt.flash(300);
     const d = $('#chamber .disc');
     if(d){ d.style.transition='transform .4s ease, opacity .4s ease'; d.style.transform='translateY(-24px) scale(.8)'; d.style.opacity='0'; setTimeout(()=>d.remove(), 400); }
     $('#chamberEmpty').style.display = '';
@@ -820,7 +851,16 @@ const ui = {
     this.index = -1; this.select(i, document.querySelectorAll('.slot')[i]);
     if(!was){ audio.pause(); this.paint(); }
   },
-  trackEnded(){ this.skip(1); },
+  trackEnded(){
+    if(GIFT.endAfterLast && this.index === TRACKS.length - 1){ this.finish(); return; }
+    this.skip(1);
+  },
+  /* 七枚目が終わったら、最初に戻らず締める。ディスクを選べばまた始まる */
+  finish(){
+    this.eject();
+    crt.flash(420);
+    this.notice('おしまい　—　また いつでも', false);
+  },
 
   paint(){
     const t = TRACKS[this.index];
@@ -829,11 +869,12 @@ const ui = {
     $('#btnPlay').setAttribute('aria-label', playing ? '一時停止' : '再生');
     $('#vfdMode').textContent = !this.loaded ? '■ STOP' : playing ? '▶ PLAY' : '❚❚ PAUSE';
     $('#vfdTrack').textContent = t ? 'TRACK '+t.n : 'TRACK --';
+    $('#vfdRepeat').textContent = GIFT.endAfterLast ? 'OF 07' : 'ALL';
     if(!this.msg) $('#vfdTitle').textContent = t ? t.title + '  —  ' + t.tag : 'ディスクを えらんでください';
     $('#vfdTotal').textContent = mmss(audio.dur || 0);
     $('#osdCh').textContent = t ? 'CH '+t.n : 'CH --';
     $('#osdMode').textContent = !this.loaded ? 'STANDBY' : playing ? '▶ PLAY' : '❚❚ PAUSE';
-    $('#rackHint').textContent = this.loaded ? 'Tap to swap' : 'Tap to load';
+    $('#rackHint').textContent = this.loaded ? 'タップして いれかえる' : 'タップして いれる';
     ['#btnRew','#btnFf','#btnEject'].forEach(s=> $(s).disabled = !this.loaded);
     const d = $('#chamber .disc');
     if(d) d.classList.toggle('spinning', true), d.classList.toggle('paused', !playing);
@@ -892,6 +933,12 @@ const ui = {
       $('#seekHead').style.left = pct+'%';
       $('#seek').setAttribute('aria-valuenow', Math.round(pct));
     }
+    if(now - (this._bufAt || 0) > 500){        // 読み込み済みの範囲は0.5秒ごと
+      this._bufAt = now;
+      let b = 0;
+      if(audio.mode === 'file' && audio.el && audio.el.buffered.length) b = audio.el.buffered.end(audio.el.buffered.length-1) / dur * 100;
+      $('#seekBuf').style.width = clamp(b, 0, 100) + '%';
+    }
     const tt = mmss(this.loaded ? pos : 0);
     if(tt !== this._time){
       this._time = tt;
@@ -928,7 +975,6 @@ const crt = (()=>{
   const stars = Array.from({length:120},()=>({x:Math.random()*2-1, y:Math.random()*2-1, z:Math.random()}));
   const flakes = Array.from({length:70},()=>({x:Math.random()*W, y:Math.random()*H, s:.3+Math.random()*1.2, r:1+Math.random()*2}));
   const media = {};
-  const BARS = ['#C8C8C8','#C8C800','#00C8C8','#00C800','#C800C8','#C80000','#0000C8'];
 
   function getMedia(t){
     if(!t.visual || media[t.visual] === false) return null;   // false = 置かれていない
@@ -949,15 +995,48 @@ const crt = (()=>{
     g.drawImage(el, dx, dy, dw, dh);
     return { x:Math.max(0,dx), y:Math.max(0,dy), w:Math.min(W,dw), h:Math.min(H,dh) };
   }
-  function bars(){
+  /* 何も入っていないとき。技術的なカラーバーではなく、贈り物の顔になる絵を映す */
+  function idle(){
     g.globalAlpha = 1;
-    BARS.forEach((c,i)=>{ g.fillStyle = c; g.fillRect(i*W/7, 0, W/7+1, H*.72); });
-    g.fillStyle='#0B0F12'; g.fillRect(0,H*.72,W,H*.28);
-    g.fillStyle='#8FA0A8'; g.font='22px DotGothic16, monospace'; g.textAlign='left';
-    g.fillText('NO DISC', 26, H*.72+52);
-    g.textAlign='right'; g.fillText('SELECT 01–07', W-26, H*.72+52);
-    g.textAlign='left';
+    g.fillStyle = '#05070A'; g.fillRect(0,0,W,H);
+    const el = GIFT.idleVisual ? getMedia({visual: GIFT.idleVisual}) : null;
+    if(el && el.complete && el.naturalWidth){
+      fit(el, 'contain', .5);
+      g.globalAlpha = .05; g.fillStyle = '#EAD9B8'; g.fillRect(0,0,W,H); g.globalAlpha = 1;
+    } else {
+      g.fillStyle = '#8FA0A8'; g.font = '26px DotGothic16, "Zen Kaku Gothic New", sans-serif';
+      g.textAlign = 'center'; g.textBaseline = 'middle';
+      g.fillText('7つの扉', W/2, H/2); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+    }
+    if(GIFT.to) caption(GIFT.to, 40, 22, false);
   }
+
+  /* 画面下に字幕を出す。歌詞の追従や宛名に使う */
+  function caption(text, y, size, band){
+    g.save(); g.shadowBlur = 0; g.globalAlpha = 1;
+    g.font = size + 'px DotGothic16, "Zen Kaku Gothic New", sans-serif';
+    g.textAlign = 'center'; g.textBaseline = 'middle';
+    let w = g.measureText(text).width;
+    if(w > W - 64){ size = Math.max(14, Math.floor(size * (W-64) / w)); g.font = size + 'px DotGothic16, "Zen Kaku Gothic New", sans-serif'; w = g.measureText(text).width; }
+    if(band !== false){ g.fillStyle = 'rgba(5,7,10,.66)'; g.fillRect(W/2 - w/2 - 16, y - size*.85, w + 32, size*1.7); }
+    g.fillStyle = '#F2FFF8'; g.shadowColor = 'rgba(124,242,200,.9)'; g.shadowBlur = 8;
+    g.fillText(text, W/2, y);
+    g.restore();
+  }
+
+  /* チャンネルを変えたときの砂嵐 */
+  let staticUntil = 0;
+  const noise = document.createElement('canvas'); noise.width = 160; noise.height = 120;
+  const ng = noise.getContext('2d');
+  function snow(){
+    const img = ng.createImageData(160, 120), d = img.data;
+    for(let i = 0; i < d.length; i += 4){ const v = (Math.random()*255)|0; d[i] = d[i+1] = d[i+2] = v; d[i+3] = 255; }
+    ng.putImageData(img, 0, 0);
+    g.globalAlpha = 1; g.imageSmoothingEnabled = false;
+    g.drawImage(noise, 0, 0, W, H);
+    g.imageSmoothingEnabled = true;
+  }
+  function flash(ms){ if(!reduced) staticUntil = performance.now() + (ms || 260); }
 
   // 画面に映っていないときは描かない。画像を映しているだけのときは
   // 描き直しも減らす。毎フレーム全面を塗り直すとスクロールが引っかかる。
@@ -970,6 +1049,10 @@ const crt = (()=>{
     requestAnimationFrame(draw);
     if(!onScreen || document.hidden) return;
     now = now || performance.now();
+    if(now < staticUntil){                              // 砂嵐は毎秒30回で
+      if(now - lastAt < 34) return;
+      lastAt = now; snow(); return;
+    }
     const track = ui.loaded ? TRACKS[ui.index] : null;
     const el = track ? getMedia(track) : null;
     const still = !!(el && el.tagName === 'IMG' && el.complete && el.naturalWidth);
@@ -977,7 +1060,7 @@ const crt = (()=>{
     if(now - lastAt < interval) return;
     lastAt = now;
     const ts = (now - t0)/1000;
-    if(!track){ bars(); return; }
+    if(!track){ idle(); return; }
 
     const lv = levels(), energy = lv.energy, live = lv.live;
     const band = i => live ? freqData[i]/255
@@ -994,6 +1077,7 @@ const crt = (()=>{
       g.fillStyle='#05070A'; g.fillRect(0,0,W,H);          // 黒帯に前の絵を残さない
       const r = fit(el, track.fit, track.focus);
       if(r){ g.globalAlpha=.07; g.fillStyle=col; g.fillRect(r.x, r.y, r.w, r.h); g.globalAlpha=1; }
+      if(track.cues && ui.curLine >= 0 && ui.lines[ui.curLine]) caption(ui.lines[ui.curLine].textContent, H - 64, 24, true);
     } else switch(track.scene){
       case 0: { // 波形
         g.beginPath();
@@ -1074,7 +1158,7 @@ const crt = (()=>{
       g.globalAlpha=.12; g.fillStyle='#DFF7EE'; g.fillRect(0,y,W,2+Math.random()*4); g.globalAlpha=1;
     }
   }
-  return { draw };
+  return { draw, flash };
 })();
 
 /* ---------- 7. 操作 ---------- */
@@ -1134,6 +1218,7 @@ function wire(){
 
 /* ---------- 8. 起動 ---------- */
 ui.build(); wire(); ui.paint();
+setTimeout(() => { TRACKS.forEach(t => { if(t.visual){ const im = new Image(); im.src = t.visual; } }); }, 1500);
 // iOS は音声要素の音量をページから変えられない。本体のボタンで操作してもらう。
 if(IOS) document.querySelector('.vol').style.display = 'none';
 (function loop(){ ui.tick(); requestAnimationFrame(loop); })();
