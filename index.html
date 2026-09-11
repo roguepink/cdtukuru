@@ -9,7 +9,7 @@
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="七枚の同じ歌">
 <meta property="og:title" content="七枚の同じ歌">
 <meta property="og:description" content="おなじ歌詞を、七通りの旋律で。">
@@ -52,20 +52,27 @@
 body{
   margin:0; background:var(--room-0); color:var(--ink);
   font-family:var(--body); font-size:15px; line-height:1.7;
-  -webkit-font-smoothing:antialiased;
+  -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%;
   background-image:
     radial-gradient(120% 80% at 50% -10%, rgba(124,242,200,.055), transparent 60%),
     radial-gradient(90% 60% at 50% 110%, rgba(226,80,58,.05), transparent 60%);
   background-attachment:fixed;
 }
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.tb,.slot,.seek,.knob{
+  -webkit-tap-highlight-color:transparent;
+  -webkit-user-select:none; user-select:none;
+  -webkit-touch-callout:none;
+}
+.tb,.slot{touch-action:manipulation}
 :focus-visible{outline:2px solid var(--vfd); outline-offset:3px; border-radius:2px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 /* ---------- 部屋 ---------- */
 .room{
   max-width:1080px; margin-inline:auto;
-  padding-inline:18px; padding-block:26px 48px;
+  padding-inline:max(18px, env(safe-area-inset-left)) max(18px, env(safe-area-inset-right));
+  padding-block:max(26px, env(safe-area-inset-top)) calc(48px + env(safe-area-inset-bottom));
   display:grid; gap:26px;
   grid-template-columns:minmax(0,1fr) 320px;
   align-items:start;
@@ -196,7 +203,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 }
 .disc .label::after{content:""; position:absolute; width:26%; height:26%; border-radius:50%; background:#0B0D10; box-shadow:0 0 0 4px rgba(255,255,255,.55)}
 .disc .label .n{
-  font-family:var(--label); font-weight:700; font-size:clamp(11px,4.5cqw,20px);
+  font-family:var(--label); font-weight:700; font-size:11px;
   color:rgba(0,0,0,.62); letter-spacing:.06em; transform:translateY(-118%);
 }
 .chamber .disc{width:86%; height:86%}
@@ -261,7 +268,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .rack-head .rule{flex:1; height:1px; background:var(--hair)}
 .shelf{display:grid; gap:10px; grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
 .slot{
-  container-type:inline-size;
   display:grid; gap:8px; justify-items:center; padding:9px 7px 10px; border-radius:var(--r-sm);
   background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
   border:1px solid rgba(255,255,255,.055); text-align:center;
@@ -272,7 +278,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .slot:hover .disc{transform:rotate(-8deg)}
 .slot .nm{font-family:var(--body); font-size:12px; line-height:1.35; color:var(--ink)}
 .slot .dur{font-family:var(--pixel); font-size:10.5px; color:var(--ink-faint); letter-spacing:.06em}
-.slot[aria-current="true"]{border-color:var(--c); background:color-mix(in srgb, var(--c) 12%, transparent)}
+.slot[aria-current="true"]{border-color:var(--c); background:var(--c-soft)}
 .slot[aria-current="true"] .nm{color:var(--c)}
 .flyer{position:fixed; z-index:60; pointer-events:none; transition:transform .68s cubic-bezier(.5,.02,.2,1), opacity .68s ease}
 
@@ -288,7 +294,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .booklet .bk-head{display:flex; align-items:baseline; gap:9px; border-bottom:1px solid rgba(30,27,21,.22); padding-bottom:10px; margin-bottom:14px}
 .booklet .bk-head .silk{color:#6A6152}
 .booklet .bk-head .tag{margin-left:auto; font-family:var(--label); font-size:10px; letter-spacing:.16em; text-transform:uppercase; color:#9A5C4B; border:1px solid rgba(154,92,75,.4); padding:1px 6px; border-radius:2px}
-.lyrics{overflow-y:auto; font-family:var(--serif); font-size:15.5px; line-height:2.15; display:grid; gap:2px; scrollbar-width:thin}
+.lyrics{overflow-y:auto; -webkit-overflow-scrolling:touch; font-family:var(--serif); font-size:15.5px; line-height:2.15; display:grid; gap:2px; scrollbar-width:thin}
 .lyrics p{margin:0; color:rgba(30,27,21,.42); transition:color .35s ease}
 .lyrics p.past{color:rgba(30,27,21,.5)}
 .lyrics p.now{color:#1E1B15; font-weight:600}
@@ -309,6 +315,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   .chamber{max-width:190px; margin-inline:auto}
 }
 @media (max-width:430px){
+  /* 操作ボタンは折り返さず一列に収める */
+  .transport{gap:6px; flex-wrap:nowrap}
+  .tb{min-width:0; flex:1; padding:0 6px; height:42px}   /* 指で押しやすい高さに */
+  .tb.play{min-width:0; flex:1.4}
   .tv{grid-template-columns:minmax(0,1fr); }
   .tv-side{flex-direction:row; align-items:center; justify-content:space-between}
   .grille{width:auto; flex:1; height:26px; background:repeating-linear-gradient(90deg,#8C8368 0 2px, rgba(0,0,0,.42) 2px 5px)}
@@ -505,6 +515,11 @@ const $ = s => document.querySelector(s);
 const clamp = (v,a,b) => v<a?a:v>b?b:v;
 const mmss = s => { s=Math.max(0,Math.floor(s)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// #rrggbb を薄い塗りに。color-mix() が使えない古い iOS でも効くように JS で作る
+const softColor = hex => {
+  const n = parseInt(hex.slice(1), 16);
+  return `rgba(${(n>>16)&255}, ${(n>>8)&255}, ${n&255}, .12)`;
+};
 const MAJOR=[0,2,4,5,7,9,11], MINOR=[0,2,3,5,7,8,10];
 const deg = (d,minor) => { const sc = minor?MINOR:MAJOR; const o=Math.floor(d/7); return sc[((d%7)+7)%7]+12*o; };
 const hz = m => 440*Math.pow(2,(m-69)/12);
@@ -527,70 +542,123 @@ function initAudio(){
 }
 function volOf(){ return Math.pow(($('#vol').value||62)/100, 1.6) * .9; }
 
+/* iPhone / iPad かどうか。iOS には次の制約があるため分岐が要る。
+   ・音声要素は「指で触れたその拍」で play() しないと鳴らない
+   ・要素ごとに解禁が要るので、七曲で一つの要素を使い回す
+   ・Web Audio を通すと本体のマナースイッチで消音される（素のまま鳴らす）
+   ・要素の volume は変更できない（音量つまみは隠す） */
+const IOS = /iP(hone|od|ad)/.test(navigator.platform) ||
+            (navigator.maxTouchPoints > 1 && /Mac/.test(navigator.platform)) ||
+            /iPhone|iPad|iPod/.test(navigator.userAgent);
+let EL = null;
+
 const audio = {
-  mode:'synth', el:null, delay:null,
+  mode:'synth', el:null, delay:null, tapped:false, watchdog:null, blocked:{},
   timer:null, step:0, nextTime:0, startCtx:0, startPos:0, playing:false, pos:0, dur:0, t:null,
+
+  /* 七曲で一つの音声要素を共有する。一度鳴らせば以後は解禁済みなので、
+     曲の自動送りも「次の曲」も指の操作なしで鳴らせる。 */
+  element(){
+    if(EL) return EL;
+    EL = new Audio();
+    EL.preload = 'metadata';
+    EL.setAttribute('playsinline', '');
+    const clear = () => { clearTimeout(this.watchdog); this.watchdog = null; };
+    EL.addEventListener('loadedmetadata', () => {
+      clear();
+      if(isFinite(EL.duration) && EL.duration > 0) this.dur = EL.duration;
+      if(this.pos > 0){ try{ EL.currentTime = this.pos; }catch(e){} }
+      ui.stamp(true); ui.paint();
+    });
+    EL.addEventListener('playing', clear);
+    EL.addEventListener('ended', () => ui.trackEnded());
+    EL.addEventListener('error', () => this.demote(this.t));
+    return EL;
+  },
 
   load(track){
     this.stopSched();
-    this.playing=false; this.pos=0; this.t=track; this.dur=track.dur||180;
-    if(this.el){ this.el.pause(); this.el.src=''; this.el=null; }
-    if(track.src){
-      this.mode='file';
-      initAudio();
-      const el = new Audio(track.src); el.preload='metadata';
-      el.addEventListener('loadedmetadata', ()=>{ if(isFinite(el.duration)) { this.dur=el.duration; ui.paint(); } ui.stamp(true); });
-      el.addEventListener('ended', ()=> ui.trackEnded());
-      el.addEventListener('error', ()=> this.demote(track));
-      this.el = el; this.tapped = false;
+    clearTimeout(this.watchdog); this.watchdog = null;
+    this.playing = false; this.pos = 0; this.t = track; this.dur = track.dur || 180;
+    if(track.src && !this.blocked[track.n]){
+      this.mode = 'file';
+      const el = this.element();
+      el.pause();
+      const want = new URL(track.src, location.href).href;
+      if(el.src !== want) el.src = track.src;
+      try{ el.currentTime = 0; }catch(e){}
+      this.el = el;
     } else {
-      this.mode='synth'; this.d = track.demo;
+      this.mode = 'synth'; this.d = track.demo;
+      if(EL) EL.pause();
+      this.el = null;
     }
   },
+
   demote(track){                       // 音源が使えないとき、仮のデモ音へ静かに切り替える
-    if(this.t !== track || this.mode === 'synth') return;
+    if(!track || this.t !== track || this.mode === 'synth') return;
+    clearTimeout(this.watchdog); this.watchdog = null;
     const was = this.playing;
-    this.mode='synth'; this.d = track.demo; this.dur = track.dur; this.el = null; this.pos = 0;
+    this.blocked[track.n] = true;      // 一度だめだった曲は繰り返し試さない
+    this.mode = 'synth'; this.d = track.demo; this.dur = track.dur; this.pos = 0;
+    if(EL) EL.pause();
+    this.el = null;
     ui.stamp(false);
     if(was){ this.playing = false; this.play(); }
     ui.paint();
   },
+
   play(){
     if(!this.t) return;
-    initAudio(); if(AC.state==='suspended') AC.resume();
+    initAudio(); if(AC.state === 'suspended') AC.resume();
     master.gain.value = volOf();
     this.playing = true;
-    if(this.mode==='file'){
-      this.el.currentTime = this.pos; this.el.play().catch(()=>{});
-      // 解析器への分岐は、音声コンテキストが確実に動いてから繋ぐ
-      // （繋いだあとは素の再生経路に戻せないため、先に生存確認する）
-      const el = this.el, from = this.pos, track = this.t;
-      setTimeout(()=>{                 // 数秒たっても頭出しが進まなければ音源が無いとみなす
-        if(this.el === el && this.playing && el.readyState < 2 && el.currentTime <= from + .01) this.demote(track);
-      }, 3500);
-      Promise.resolve(AC.resume()).catch(()=>{}).then(()=>{
-        if(this.el !== el || this.tapped || AC.state !== 'running') return;
-        try{ elSrc = AC.createMediaElementSource(el); elSrc.connect(master); elSrc.connect(this.delay); this.tapped = true; }catch(e){}
-      });
+    if(this.mode === 'file'){
+      const el = this.el, track = this.t;
+      if(el.readyState > 0 && Math.abs(el.currentTime - this.pos) > .3){
+        try{ el.currentTime = this.pos; }catch(e){}
+      }
+      el.play().catch(()=>{});
+      // 読み込みが全く始まらないときだけ仮の音へ。回線が遅いだけの場合に
+      // 誤って切り替えないよう、十分待ってから readyState を見る。
+      clearTimeout(this.watchdog);
+      this.watchdog = setTimeout(() => {
+        if(this.mode === 'file' && this.t === track && el.readyState === 0) this.demote(track);
+      }, 12000);
+      // 解析器へ分岐すると iOS ではマナースイッチで消音されるため、iOS では繋がない。
+      // 繋いだあとは素の再生経路へ戻せないので、他の環境でも生存確認してから。
+      if(!IOS && !this.tapped){
+        Promise.resolve(AC.resume()).catch(()=>{}).then(() => {
+          if(this.tapped || AC.state !== 'running') return;
+          try{
+            elSrc = AC.createMediaElementSource(el);
+            elSrc.connect(master); elSrc.connect(this.delay); this.tapped = true;
+          }catch(e){}
+        });
+      }
     }
     else{ this.delay.delayTime.value = this.d.dly; this.startSched(); }
   },
+
   pause(){
     this.playing = false;
-    if(this.mode==='file'){ this.pos = this.el.currentTime; this.el.pause(); }
+    if(this.mode === 'file'){ this.pos = this.el.currentTime; this.el.pause(); }
     else { this.pos = this.position(); this.stopSched(); }
   },
+
   seek(t){
     t = clamp(t, 0, this.dur);
     this.pos = t;
-    if(this.mode==='file'){ this.el.currentTime = t; }
+    if(this.mode === 'file'){ if(this.el.readyState > 0){ try{ this.el.currentTime = t; }catch(e){} } }
     else if(this.playing){ this.stopSched(); this.startSched(); }
   },
+
   position(){
     if(!this.t) return 0;
-    if(this.mode==='file') return this.el ? this.el.currentTime : 0;
+    if(this.mode === 'file') return this.el ? this.el.currentTime : 0;
     return this.playing ? Math.min(this.dur, this.startPos + (AC.currentTime - this.startCtx)) : this.pos;
   },
+
   /* --- 仮デモ音の生成 --- */
   startSched(){
     const stepDur = 60/this.d.bpm/2;
@@ -651,6 +719,7 @@ const ui = {
     TRACKS.forEach((t,i)=>{
       const b = document.createElement('button');
       b.className='slot'; b.type='button'; b.style.setProperty('--c', t.c);
+      b.style.setProperty('--c-soft', softColor(t.c));
       b.setAttribute('aria-current','false');
       b.innerHTML = `<span class="disc" style="--c:${t.c}"><span class="label"><span class="n">${t.n}</span></span></span>
         <span class="nm">${t.title}</span><span class="dur">${t.tag} · ${mmss(t.dur)}</span>`;
@@ -676,12 +745,14 @@ const ui = {
     this.index = i; const t = TRACKS[i];
     document.querySelectorAll('.slot').forEach((s,j)=> s.setAttribute('aria-current', j===i ? 'true':'false'));
     audio.load(t);
-    this.insertDisc(btn, wasLoaded, ()=>{ this.play(); });
+    this.loaded = true;
+    audio.play();                 // 指で触れたその拍で鳴らす。遅らせると iOS で無音になる
+    this.insertDisc(btn, wasLoaded);
     this.paint();
   },
 
   /* ディスクが棚からデッキへ飛んでいく */
-  insertDisc(btn, replace, done){
+  insertDisc(btn, replace){
     const t = TRACKS[this.index], chamber = $('#chamber');
     const src = btn ? btn.querySelector('.disc') : null;
     const old = chamber.querySelector('.disc');
@@ -692,7 +763,7 @@ const ui = {
       d.className = 'disc'; d.style.setProperty('--c', t.c);
       d.innerHTML = `<span class="label"><span class="n">${t.n}</span></span>`;
       chamber.appendChild(d);
-      this.loaded = true; done && done();
+      this.loaded = true;
     };
     if(!src || reduced){ put(); return; }
     const a = src.getBoundingClientRect(), target = chamber.getBoundingClientRect();
@@ -724,10 +795,10 @@ const ui = {
   toggle(){ if(!this.loaded){ this.select(0, document.querySelector('.slot')); return; } audio.playing ? audio.pause() : audio.play(); this.paint(); },
   skip(dir){
     if(!this.loaded){ this.select(0, document.querySelector('.slot')); return; }
-    const i = (this.index + dir + TRACKS.length) % TRACKS.length;
     const was = audio.playing;
+    const i = (this.index + dir + TRACKS.length) % TRACKS.length;
     this.index = -1; this.select(i, document.querySelectorAll('.slot')[i]);
-    if(!was) setTimeout(()=>{ audio.pause(); this.paint(); }, 720);
+    if(!was){ audio.pause(); this.paint(); }
   },
   trackEnded(){ this.skip(1); },
 
@@ -995,6 +1066,8 @@ function wire(){
 
 /* ---------- 8. 起動 ---------- */
 ui.build(); wire(); ui.paint();
+// iOS は音声要素の音量をページから変えられない。本体のボタンで操作してもらう。
+if(IOS) document.querySelector('.vol').style.display = 'none';
 (function loop(){ ui.tick(); requestAnimationFrame(loop); })();
 crt.draw();
 </script>

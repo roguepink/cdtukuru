@@ -16,7 +16,7 @@ doc = (
     "<link rel=\"apple-touch-icon\" href=\"assets/icon-180.png\">\n"
     "<link rel=\"manifest\" href=\"manifest.webmanifest\">\n"
     "<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">\n"
-    "<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black-translucent\">\n"
+    "<meta name=\"apple-mobile-web-app-status-bar-style\" content=\"black\">\n"
     "<meta name=\"apple-mobile-web-app-title\" content=\"七枚の同じ歌\">\n"
     f"<meta property=\"og:title\" content=\"七枚の同じ歌\">\n"
     "<meta property=\"og:description\" content=\"おなじ歌詞を、七通りの旋律で。\">\n"
