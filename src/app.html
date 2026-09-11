@@ -800,18 +800,25 @@ const ui = {
   },
 
   /* ディスクが棚からデッキへ飛んでいく */
+  /* 連打されても一枚だけにする。前のディスクがまだ飛んでいる途中なら、
+     そのコピーと「置く」予約を取り消してから、新しい一枚を飛ばす。 */
+  cancelFlight(){
+    clearTimeout(this.flightTimer); this.flightTimer = null;
+    if(this.flyer){ this.flyer.remove(); this.flyer = null; }
+  },
   insertDisc(btn, replace){
     const t = TRACKS[this.index], chamber = $('#chamber');
     const src = btn ? btn.querySelector('.disc') : null;
-    const old = chamber.querySelector('.disc');
-    if(old) old.remove();
+    this.cancelFlight();
+    chamber.querySelectorAll('.disc').forEach(d => d.remove());
     $('#chamberEmpty').style.display = 'none';
     const put = ()=>{
+      chamber.querySelectorAll('.disc').forEach(d => d.remove());   // 念のため、置く直前にも空にする
       const d = document.createElement('span');
       d.className = 'disc'; d.style.setProperty('--c', t.c);
       d.innerHTML = `<span class="label"><span class="n">${t.n}</span></span>`;
       chamber.appendChild(d);
-      this.loaded = true;
+      this.loaded = true; this.paint();
     };
     if(!src || reduced){ put(); return; }
     const a = src.getBoundingClientRect(), target = chamber.getBoundingClientRect();
@@ -819,17 +826,18 @@ const ui = {
     const fly = src.cloneNode(true);
     fly.className = 'disc flyer';
     Object.assign(fly.style, {left:a.left+'px', top:a.top+'px', width:a.width+'px', height:a.height+'px'});
-    document.body.appendChild(fly);
+    document.body.appendChild(fly); this.flyer = fly;
     const tx = target.left + (target.width - size)/2 - a.left;
     const ty = target.top + (target.height - size)/2 - a.top;
     requestAnimationFrame(()=>{
       fly.style.transform = `translate(${tx}px, ${ty}px) scale(${size/a.width}) rotate(200deg)`;
     });
-    setTimeout(()=>{ fly.remove(); put(); }, 700);
+    this.flightTimer = setTimeout(()=>{ this.flyer = null; fly.remove(); put(); }, 700);
   },
 
   eject(){
     if(!this.loaded) return;
+    this.cancelFlight();
     audio.pause(); audio.pos = 0;
     crt.flash(300);
     const d = $('#chamber .disc');
