@@ -597,10 +597,9 @@ const audio = {
 
   play(){
     if(!this.t) return;
-    initAudio(); if(AC.state === 'suspended') AC.resume();
-    master.gain.value = volOf();
     this.playing = true;
     if(this.mode === 'file'){
+      if(!IOS){ initAudio(); if(AC.state === 'suspended') AC.resume(); master.gain.value = volOf(); }
       const el = this.el, track = this.t;
       if(el.readyState > 0 && Math.abs(el.currentTime - this.pos) > .3){
         try{ el.currentTime = this.pos; }catch(e){}
@@ -627,7 +626,11 @@ const audio = {
         });
       }
     }
-    else{ this.delay.delayTime.value = this.d.dly; this.startSched(); }
+    else{
+      initAudio(); if(AC.state === 'suspended') AC.resume();
+      master.gain.value = volOf();
+      this.delay.delayTime.value = this.d.dly; this.startSched();
+    }
   },
 
   pause(){
@@ -729,7 +732,7 @@ const ui = {
   },
 
   select(i, btn){
-    initAudio(); if(AC.state==='suspended') AC.resume();
+    if(!IOS){ initAudio(); if(AC.state==='suspended') AC.resume(); }
     if(this.index === i){ this.toggle(); return; }
     const wasLoaded = this.loaded;
     this.index = i; const t = TRACKS[i];
@@ -863,7 +866,7 @@ const ui = {
       this.setLine(idx);
     }
     // レベルメーター
-    if(analyser){
+    {
       const lv = levels(), bars = $('#meter').children, ts = performance.now()/1000;
       for(let i=0;i<bars.length;i++){
         const v = lv.live ? freqData[2 + i*3]/255
@@ -1020,7 +1023,7 @@ const crt = (()=>{
 
 /* ---------- 7. 操作 ---------- */
 function wire(){
-  $('#btnPlay').addEventListener('click', ()=>{ initAudio(); if(AC.state==='suspended') AC.resume(); ui.toggle(); });
+  $('#btnPlay').addEventListener('click', ()=>{ if(!IOS){ initAudio(); if(AC.state==='suspended') AC.resume(); } ui.toggle(); });
   $('#btnPrev').addEventListener('click', ()=> ui.skip(-1));
   $('#btnNext').addEventListener('click', ()=> ui.skip(1));
   $('#btnEject').addEventListener('click', ()=> ui.eject());
@@ -1062,7 +1065,7 @@ function wire(){
   // キーボード
   addEventListener('keydown', e=>{
     if(e.target.matches('input,[role=slider]')) return;
-    if(e.code==='Space'){ e.preventDefault(); initAudio(); if(AC.state==='suspended') AC.resume(); ui.toggle(); }
+    if(e.code==='Space'){ e.preventDefault(); if(!IOS){ initAudio(); if(AC.state==='suspended') AC.resume(); } ui.toggle(); }
     if(e.key==='ArrowRight' && e.shiftKey) ui.skip(1);
     if(e.key==='ArrowLeft' && e.shiftKey) ui.skip(-1);
     if(/^[1-7]$/.test(e.key)){ const i=+e.key-1; ui.select(i, document.querySelectorAll('.slot')[i]); }
