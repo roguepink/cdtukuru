@@ -10,14 +10,14 @@
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
-<meta name="apple-mobile-web-app-title" content="7つの扉">
-<meta property="og:title" content="7つの扉">
-<meta property="og:description" content="おなじ歌詞を、七通りの旋律で。">
+<meta name="apple-mobile-web-app-title" content="7つのシングルCD">
+<meta property="og:title" content="7つのシングルCD">
+<meta property="og:description" content="おなじ歌詞に、七つのメロディをつけました。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://roguepink.github.io/cdtukuru/">
 <meta property="og:image" content="https://roguepink.github.io/cdtukuru/assets/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<title>7つの扉</title>
+<title>7つのシングルCD</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=DotGothic16&family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
@@ -353,8 +353,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <div class="room"><header class="masthead">
     <div>
       <p class="to" id="dedication" hidden></p>
-      <h1>7つの扉</h1>
-      <p class="sub"><span>おなじ歌詞を、七通りの旋律で。</span> <span>ディスクを選んで、デッキに入れてください。</span></p>
+      <h1>7つのシングルCD</h1>
+      <p class="sub"><span>おなじ歌詞に、七つのメロディをつけました。</span> <span>すきなディスクをえらぶと、デッキに入って流れます。</span></p>
     </div>
   </header>
 
@@ -1014,7 +1014,19 @@ const crt = (()=>{
     g.drawImage(el, dx, dy, dw, dh);
     return { x:Math.max(0,dx), y:Math.max(0,dy), w:Math.min(W,dw), h:Math.min(H,dh) };
   }
-  /* 何も入っていないとき。技術的なカラーバーではなく、贈り物の顔になる絵を映す */
+  /* 電源を入れた直後だけカラーバー。テレビが点いてから、贈り物の絵に切り替わる */
+  const BARS = ['#C0C0C0','#C0C000','#00C0C0','#00C000','#C000C0','#C00000','#0000C0'];
+  let bootUntil = performance.now() + (reduced ? 600 : 1500), booted = false;
+  function bars(){
+    g.globalAlpha = 1;
+    BARS.forEach((c,i)=>{ g.fillStyle = c; g.fillRect(i*W/7, 0, W/7+1, H*.72); });
+    g.fillStyle = '#0B0F12'; g.fillRect(0, H*.72, W, H*.28);
+    g.fillStyle = '#8FA0A8'; g.font = '22px DotGothic16, monospace'; g.textAlign = 'left';
+    g.fillText('NO DISC', 26, H*.72+52);
+    g.textAlign = 'right'; g.fillText('SELECT 01–07', W-26, H*.72+52);
+    g.textAlign = 'left';
+  }
+  /* 何も入っていないとき。贈り物の顔になる絵を映す */
   function idle(){
     g.globalAlpha = 1;
     g.fillStyle = '#05070A'; g.fillRect(0,0,W,H);
@@ -1025,7 +1037,7 @@ const crt = (()=>{
     } else {
       g.fillStyle = '#8FA0A8'; g.font = '26px DotGothic16, "Zen Kaku Gothic New", sans-serif';
       g.textAlign = 'center'; g.textBaseline = 'middle';
-      g.fillText('7つの扉', W/2, H/2); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
+      g.fillText('7つのシングルCD', W/2, H/2); g.textAlign = 'left'; g.textBaseline = 'alphabetic';
     }
     if(GIFT.to) caption(GIFT.to, 40, 22, false);
   }
@@ -1079,7 +1091,13 @@ const crt = (()=>{
     if(now - lastAt < interval) return;
     lastAt = now;
     const ts = (now - t0)/1000;
-    if(!track){ idle(); return; }
+    if(!track){
+      if(!booted){
+        if(now < bootUntil){ bars(); return; }
+        booted = true; flash(320); return;             // カラーバー → 砂嵐 → おめでとう
+      }
+      idle(); return;
+    }
 
     const lv = levels(), energy = lv.energy, live = lv.live;
     const band = i => live ? freqData[i]/255
