@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>歌詞あわせ — 7つの扉</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600&family=Shippori+Mincho:wght@500&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+  :root{
+    --bg:#14161A; --panel:#1E2128; --line:rgba(232,227,217,.12);
+    --ink:#EAE5D9; --dim:#948E82; --faint:#5E594F;
+    --go:#7CF2C8; --hot:#E2503A;
+    --label:'Barlow Semi Condensed',sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:"Zen Kaku Gothic New",system-ui,sans-serif;font-size:15px;line-height:1.7}
+  .wrap{max-width:940px;margin-inline:auto;padding-inline:18px;padding-block:24px 60px;display:grid;gap:20px}
+  h1{font-size:22px;margin:0;letter-spacing:.06em}
+  .sub{margin:6px 0 0;color:var(--dim);font-size:13px}
+  .silk{font-family:var(--label);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:16px}
+
+  .steps{display:grid;gap:6px;margin:0;padding-left:1.3em;color:var(--dim);font-size:13.5px}
+  .steps b{color:var(--ink)}
+  kbd{font-family:var(--label);font-size:12px;letter-spacing:.08em;background:#2C313A;border:1px solid var(--line);
+      border-bottom-width:2px;border-radius:4px;padding:1px 7px;color:var(--ink)}
+
+  .tracks{display:flex;flex-wrap:wrap;gap:8px}
+  .tk{border:1px solid var(--line);background:#22262E;color:var(--ink);border-radius:5px;
+      padding:8px 13px;cursor:pointer;font:inherit;font-size:13.5px}
+  .tk[aria-current=true]{border-color:var(--go);color:var(--go);background:rgba(124,242,200,.08)}
+  .tk .n{font-family:var(--label);letter-spacing:.12em;color:var(--faint);margin-right:7px}
+  .tk[aria-current=true] .n{color:var(--go)}
+  .tk .ok{color:var(--go);margin-left:7px}
+
+  .deck{display:grid;gap:12px}
+  .row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+  button.b{font:inherit;border:1px solid var(--line);background:#2C313A;color:var(--ink);
+    border-radius:5px;padding:9px 15px;cursor:pointer}
+  button.b:hover{background:#363C46}
+  button.b:disabled{opacity:.4;cursor:not-allowed}
+  .mark{flex:1;min-width:220px;background:linear-gradient(180deg,#9BF6D6,#4FB795);color:#0B1310;
+    border:0;border-radius:6px;padding:17px;font-size:17px;font-weight:700;cursor:pointer}
+  .mark:disabled{background:#3A4048;color:var(--faint)}
+  .time{font-family:var(--label);font-size:26px;letter-spacing:.06em;font-variant-numeric:tabular-nums;min-width:112px}
+  input[type=range]{flex:1;min-width:180px;accent-color:#4FB795}
+
+  .lines{display:grid;gap:1px;max-height:52vh;overflow:auto;border:1px solid var(--line);border-radius:6px}
+  .ln{display:grid;grid-template-columns:34px 74px 1fr;gap:10px;align-items:baseline;
+      padding:7px 11px;background:#1A1D23;border:0;text-align:left;color:var(--dim);
+      font-family:"Shippori Mincho",serif;font-size:14.5px;cursor:pointer;width:100%}
+  .ln:hover{background:#232830}
+  .ln .i{font-family:var(--label);font-size:11px;color:var(--faint);letter-spacing:.1em}
+  .ln .t{font-family:var(--label);font-size:12.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+  .ln.done{color:var(--ink)} .ln.done .t{color:var(--go)}
+  .ln.cur{background:rgba(124,242,200,.10);color:var(--ink);box-shadow:inset 3px 0 0 var(--go)}
+  .ln.sec{font-family:var(--label);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+          color:#9A5C4B;cursor:default;background:#161920}
+  .ln.sec:hover{background:#161920}
+
+  textarea{width:100%;min-height:120px;background:#12151A;color:var(--go);border:1px solid var(--line);
+    border-radius:6px;padding:12px;font-family:var(--label);font-size:13px;line-height:1.7;resize:vertical}
+  .note{color:var(--faint);font-size:12.5px}
+  .hot{color:var(--hot)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>歌詞あわせ</h1>
+    <p class="sub">曲を聴きながら、歌が次の行に移った瞬間にキーを叩くだけ。秒数が記録されます。</p>
+  </header>
+
+  <div class="card">
+    <ol class="steps">
+      <li>下の曲を選ぶ</li>
+      <li><b>再生</b>を押す（<kbd>P</kbd> でも可）</li>
+      <li>歌が<b>その行を歌い始めた瞬間</b>に <kbd>SPACE</kbd> を叩く。緑のボタンを押しても同じ</li>
+      <li>叩き間違えたら <kbd>BACKSPACE</kbd> で一つ戻る。行をクリックすればそこから再開できます</li>
+      <li>最後まで行ったら、一番下の文字列をコピーしてチャットに貼ってください</li>
+    </ol>
+    <p class="note" style="margin:10px 0 0">コツ：再生速度を 0.75 に落とすと叩きやすくなります。少し遅れて叩いても、あとで微調整できます。</p>
+  </div>
+
+  <div>
+    <div class="silk" style="margin-bottom:8px">曲をえらぶ</div>
+    <div class="tracks" id="tracks"></div>
+  </div>
+
+  <div class="card deck">
+    <div class="row">
+      <button class="b" id="play">再生</button>
+      <button class="b" id="back5">−5秒</button>
+      <button class="b" id="fwd5">＋5秒</button>
+      <span class="time" id="clock">0:00.0</span>
+      <label class="silk">速さ
+        <select id="rate" class="b" style="padding:6px 9px;margin-left:6px">
+          <option value="0.75">0.75×</option>
+          <option value="1" selected>1×</option>
+          <option value="1.25">1.25×</option>
+        </select>
+      </label>
+    </div>
+    <input type="range" id="seek" min="0" max="1000" value="0">
+    <div class="row">
+      <button class="mark" id="mark" disabled>この行の頭 &nbsp;[SPACE]</button>
+      <button class="b" id="undo">一つ戻す</button>
+      <button class="b" id="reset">この曲をやり直す</button>
+    </div>
+  </div>
+
+  <div class="lines" id="lines"></div>
+
+  <div>
+    <div class="silk" style="margin-bottom:8px">結果（これをコピーして貼ってください）</div>
+    <textarea id="out" readonly></textarea>
+    <div class="row" style="margin-top:9px">
+      <button class="b" id="copy">コピー</button>
+      <span class="note" id="status"></span>
+    </div>
+  </div>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+let TRACKS = [], LYRICS = [], lyricLines = [], idx = 0, cur = 0;
+let cues = JSON.parse(localStorage.getItem('cues7') || '{}');
+const el = new Audio();
+el.preload = 'metadata';
+
+/* 本体（index.html）から曲と歌詞を読み出す。写しを持たないため常に最新。 */
+(async function boot(){
+  const src = await fetch('../index.html').then(r => r.text());
+  const grab = name => {
+    const m = src.match(new RegExp('const ' + name + ' = (\\[[\\s\\S]*?\\n\\]);'));
+    return m ? Function('"use strict";return ' + m[1])() : [];
+  };
+  TRACKS = grab('TRACKS'); LYRICS = grab('LYRICS');
+  lyricLines = LYRICS.filter(l => l !== '' && !/^\[.*\]$/.test(l));
+  $('#tracks').innerHTML = TRACKS.map((t,i) =>
+    `<button class="tk" data-i="${i}"><span class="n">${t.n}</span>${t.title}<span class="ok" data-ok="${i}"></span></button>`).join('');
+  $('#tracks').addEventListener('click', e => {
+    const b = e.target.closest('.tk'); if(b) pick(+b.dataset.i);
+  });
+  renderLines(); marks(); pick(0);
+})();
+
+function pick(i){
+  idx = i;
+  document.querySelectorAll('.tk').forEach((b,j) => b.setAttribute('aria-current', j===i));
+  el.pause(); el.src = '../' + TRACKS[i].src; el.currentTime = 0;
+  cur = (cues[TRACKS[i].n] || []).length;
+  $('#play').textContent = '再生';
+  render(); out();
+}
+function list(){ return cues[TRACKS[idx].n] || (cues[TRACKS[idx].n] = []); }
+
+function renderLines(){
+  const box = $('#lines'); box.innerHTML = '';
+  let k = 0;
+  LYRICS.forEach(l => {
+    if(l === '') return;
+    const sec = /^\[.*\]$/.test(l);
+    const b = document.createElement('button');
+    b.className = 'ln' + (sec ? ' sec' : '');
+    if(sec){ b.innerHTML = `<span></span><span></span><span>${l.slice(1,-1)}</span>`; }
+    else{
+      const n = k++;
+      b.dataset.n = n;
+      b.innerHTML = `<span class="i">${String(n+1).padStart(2,'0')}</span><span class="t">—</span><span>${l}</span>`;
+      b.addEventListener('click', () => {
+        cur = n;                                    // ここから叩き直す
+        const t = list()[n];
+        if(t != null) el.currentTime = Math.max(0, t - 1.5);
+        render();
+      });
+    }
+    box.appendChild(b);
+  });
+}
+function render(){
+  const c = list();
+  document.querySelectorAll('.ln[data-n]').forEach(b => {
+    const n = +b.dataset.n, t = c[n];
+    b.classList.toggle('done', t != null);
+    b.classList.toggle('cur', n === cur);
+    b.querySelector('.t').textContent = t == null ? '—'
+      : Math.floor(t/60) + ':' + (t%60).toFixed(1).padStart(4,'0');
+  });
+  const now = document.querySelector('.ln.cur');
+  if(now) now.scrollIntoView({block:'center', behavior:'smooth'});
+  $('#mark').disabled = !(cur < lyricLines.length);
+  $('#mark').textContent = cur < lyricLines.length
+    ? `${String(cur+1).padStart(2,'0')} ${lyricLines[cur]} の頭　[SPACE]` : 'この曲は完了';
+  marks(); out();
+}
+function marks(){
+  TRACKS.forEach((t,i) => {
+    const n = (cues[t.n] || []).filter(v => v != null).length;
+    const s = document.querySelector(`[data-ok="${i}"]`);
+    if(s) s.textContent = n === 0 ? '' : n >= lyricLines.length ? '✓' : `${n}/${lyricLines.length}`;
+  });
+}
+function save(){ localStorage.setItem('cues7', JSON.stringify(cues)); }
+function out(){
+  const done = TRACKS.filter(t => (cues[t.n]||[]).filter(v=>v!=null).length);
+  $('#out').value = done.length ? done.map(t =>
+    `${t.n}: [${(cues[t.n]||[]).map(v => v == null ? 'null' : v.toFixed(1)).join(', ')}]`).join('\n\n')
+    : '（まだ記録がありません）';
+  $('#status').textContent = `${done.length} 曲ぶん記録済み`;
+}
+
+function mark(){
+  if(cur >= lyricLines.length) return;
+  list()[cur] = +el.currentTime.toFixed(2);
+  cur++; save(); render();
+}
+function undo(){ if(cur > 0){ cur--; list()[cur] = null; save(); render(); } }
+
+$('#mark').addEventListener('click', mark);
+$('#undo').addEventListener('click', undo);
+$('#reset').addEventListener('click', () => { cues[TRACKS[idx].n] = []; cur = 0; save(); render(); });
+$('#play').addEventListener('click', () => { el.paused ? el.play() : el.pause(); });
+el.addEventListener('play', () => $('#play').textContent = '一時停止');
+el.addEventListener('pause', () => $('#play').textContent = '再生');
+$('#back5').addEventListener('click', () => el.currentTime = Math.max(0, el.currentTime - 5));
+$('#fwd5').addEventListener('click', () => el.currentTime += 5);
+$('#rate').addEventListener('change', e => el.playbackRate = +e.target.value);
+$('#seek').addEventListener('input', e => { if(el.duration) el.currentTime = el.duration * e.target.value/1000; });
+$('#copy').addEventListener('click', async () => {
+  await navigator.clipboard.writeText($('#out').value);
+  $('#status').textContent = 'コピーしました';
+});
+el.addEventListener('timeupdate', () => {
+  const t = el.currentTime;
+  $('#clock').textContent = Math.floor(t/60) + ':' + (t%60).toFixed(1).padStart(4,'0');
+  if(el.duration) $('#seek').value = Math.round(t/el.duration*1000);
+});
+addEventListener('keydown', e => {
+  if(e.target.matches('input,select,textarea')) return;
+  if(e.code === 'Space'){ e.preventDefault(); mark(); }
+  if(e.code === 'Backspace'){ e.preventDefault(); undo(); }
+  if(e.key === 'p' || e.key === 'P'){ e.preventDefault(); el.paused ? el.play() : el.pause(); }
+});
+</script>
+</body>
+</html>

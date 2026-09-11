@@ -56,7 +56,7 @@ body{
   background-image:
     radial-gradient(120% 80% at 50% -10%, rgba(124,242,200,.055), transparent 60%),
     radial-gradient(90% 60% at 50% 110%, rgba(226,80,58,.05), transparent 60%);
-  background-attachment:fixed;
+  background-repeat:no-repeat;
 }
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .tb,.slot,.seek,.knob{
@@ -435,7 +435,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <span class="tag">七曲共通</span>
     </div>
     <div class="lyrics" id="lyrics"></div>
-    <p class="bk-foot">七枚とも歌詞は同じ。旋律だけが変わります。<br>行の送りは尺に合わせた自動送りです（秒単位で合わせることもできます）。</p>
+    <p class="bk-foot">七枚とも歌詞は同じ。旋律だけが変わります。<br>曲に合わせて行が進むのは、秒数を合わせた曲だけです。</p>
   </aside>
 
 </div>
@@ -758,6 +758,13 @@ const ui = {
     });
     const m = $('#meter');
     for(let i=0;i<14;i++) m.appendChild(document.createElement('i'));
+    // 手でスクロールしたことを覚えておく（自動追従はそのあいだ止める）
+    this.touchedAt = -1e9;
+    const box = $('#lyrics');
+    const touched = () => { if(!this.autoScrolling) this.touchedAt = performance.now(); };
+    box.addEventListener('scroll', touched, {passive:true});
+    box.addEventListener('wheel', touched, {passive:true});
+    box.addEventListener('touchstart', touched, {passive:true});
   },
 
   select(i, btn){
@@ -869,34 +876,49 @@ const ui = {
       p.classList.toggle('past', j<i);
     });
     const box = $('#lyrics'), p = this.lines[i];
-    if(p && box.scrollHeight > box.clientHeight + 4){
-      box.scrollTo({top: p.offsetTop - box.clientHeight/2 + p.offsetHeight/2, behavior: reduced ? 'auto':'smooth'});
-    }
+    if(!p || box.scrollHeight <= box.clientHeight + 4) return;
+    // 自分でスクロールしたあとしばらくは、こちらから動かさない
+    if(performance.now() - this.touchedAt < 9000) return;
+    const top = p.offsetTop - box.clientHeight/2 + p.offsetHeight/2;
+    if(Math.abs(box.scrollTop - top) < 8) return;
+    this.autoScrolling = true;
+    box.scrollTo({top, behavior: reduced ? 'auto' : 'smooth'});
+    clearTimeout(this.scrollTimer);
+    this.scrollTimer = setTimeout(()=>{ this.autoScrolling = false; }, 700);
   },
 
   tick(){
     const pos = audio.position(), dur = audio.dur || 1;
     if(this.loaded && audio.mode==='synth' && audio.playing && pos >= dur - .05) this.trackEnded();
+    const now = performance.now();
+    // 画面の書き換えは値が変わったときだけ。毎フレーム触るとスクロールが引っかかる。
     const pct = clamp(pos/dur*100, 0, 100);
-    $('#seekFill').style.width = pct+'%';
-    $('#seekHead').style.left = pct+'%';
-    $('#seek').setAttribute('aria-valuenow', Math.round(pct));
-    $('#vfdElapsed').textContent = mmss(this.loaded ? pos : 0);
-    $('#osdTime').textContent = mmss(this.loaded ? pos : 0);
-    // 歌詞：cues があればそれ、無ければ尺で等分
+    if(Math.abs(pct - (this._pct ?? -1)) > .06){
+      this._pct = pct;
+      $('#seekFill').style.width = pct+'%';
+      $('#seekHead').style.left = pct+'%';
+      $('#seek').setAttribute('aria-valuenow', Math.round(pct));
+    }
+    const tt = mmss(this.loaded ? pos : 0);
+    if(tt !== this._time){
+      this._time = tt;
+      $('#vfdElapsed').textContent = tt;
+      $('#osdTime').textContent = tt;
+    }
+    // 歌詞の追従は、実際に測った秒数（cues）がある曲だけ。
+    // 尺で等分した当て推量は歌と合わず、勝手にスクロールして読みづらいので行わない。
     if(this.loaded && this.lines.length){
       const t = TRACKS[this.index];
-      let idx = -1;
-      if(t.cues){ for(let i=0;i<t.cues.length;i++) if(pos >= t.cues[i]) idx = i; }
-      else{
-        const intro = dur*.05, span = dur*.87;
-        idx = pos < intro ? -1 : Math.min(this.lines.length-1, Math.floor((pos-intro)/(span/this.lines.length)));
+      if(t.cues){
+        let idx = -1;
+        for(let i=0;i<t.cues.length;i++) if(pos >= t.cues[i]) idx = i;
+        this.setLine(idx);
       }
-      this.setLine(idx);
     }
     // レベルメーター
-    {
-      const lv = levels(), bars = $('#meter').children, ts = performance.now()/1000;
+    if(now - (this._meterAt || 0) > 55){     // メーターは毎秒20回で十分
+      this._meterAt = now;
+      const lv = levels(), bars = $('#meter').children, ts = now/1000;
       for(let i=0;i<bars.length;i++){
         const v = lv.live ? freqData[2 + i*3]/255
                           : audio.playing ? (.25 + .22*Math.sin(ts*5.5 - i*.6) + .12*Math.sin(ts*2.1 + i)) : 0;
@@ -944,12 +966,25 @@ const crt = (()=>{
     g.textAlign='left';
   }
 
-  let t0 = performance.now();
-  function draw(){
+  // 画面に映っていないときは描かない。画像を映しているだけのときは
+  // 描き直しも減らす。毎フレーム全面を塗り直すとスクロールが引っかかる。
+  let t0 = performance.now(), lastAt = 0, onScreen = true;
+  if('IntersectionObserver' in window){
+    new IntersectionObserver(es => { onScreen = es[0].isIntersecting; }, {rootMargin:'120px'}).observe(cv);
+  }
+
+  function draw(now){
     requestAnimationFrame(draw);
-    const now = performance.now(), ts = (now-t0)/1000;
-    const track = TRACKS[ui.index];
-    if(!ui.loaded || !track){ bars(); return; }
+    if(!onScreen || document.hidden) return;
+    now = now || performance.now();
+    const track = ui.loaded ? TRACKS[ui.index] : null;
+    const el = track ? getMedia(track) : null;
+    const still = !!(el && el.tagName === 'IMG' && el.complete && el.naturalWidth);
+    const interval = !track ? 400 : still ? 90 : 34;   // 待機0.4s / 画像0.09s / 自動生成0.034s
+    if(now - lastAt < interval) return;
+    lastAt = now;
+    const ts = (now - t0)/1000;
+    if(!track){ bars(); return; }
 
     const lv = levels(), energy = lv.energy, live = lv.live;
     const band = i => live ? freqData[i]/255
@@ -961,7 +996,6 @@ const crt = (()=>{
     g.shadowBlur = 14; g.shadowColor = col; g.strokeStyle = col; g.fillStyle = col;
     g.lineWidth = 2;
 
-    const el = getMedia(track);
     if(el && (el.complete || el.readyState>=2)){
       g.shadowBlur=0; g.globalAlpha=1;
       g.fillStyle='#05070A'; g.fillRect(0,0,W,H);          // 黒帯に前の絵を残さない
@@ -1110,7 +1144,7 @@ ui.build(); wire(); ui.paint();
 // iOS は音声要素の音量をページから変えられない。本体のボタンで操作してもらう。
 if(IOS) document.querySelector('.vol').style.display = 'none';
 (function loop(){ ui.tick(); requestAnimationFrame(loop); })();
-crt.draw();
+requestAnimationFrame(crt.draw);
 </script>
 </body>
 </html>
