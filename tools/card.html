@@ -1,0 +1,49 @@
+<!doctype html><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600&family=Shippori+Mincho:wght@600&family=Zen+Kaku+Gothic+New:wght@400&display=swap">
+<style>
+  *{box-sizing:border-box} body{margin:0;background:#0C0D10;font-family:"Zen Kaku Gothic New",sans-serif;color:#EAE5D9}
+  .disc{position:relative;border-radius:50%;
+    background:radial-gradient(circle at 50% 50%, transparent 0 13%, rgba(0,0,0,.55) 13% 14.5%, transparent 14.5%),
+      conic-gradient(from 0deg,#6ad6ff,#a58cff,#ff8fc7,#ffd36b,#8dffc0,#6ad6ff),#20242a;
+    box-shadow:0 0 0 1px rgba(0,0,0,.7), 0 10px 24px -8px #000}
+  .disc::before{content:"";position:absolute;inset:0;border-radius:50%;
+    background:radial-gradient(circle at 50% 50%, rgba(10,12,14,.92) 0 30%, rgba(10,12,14,.34) 34%, rgba(10,12,14,.62) 60%, rgba(10,12,14,.3) 100%),
+      linear-gradient(135deg, rgba(255,255,255,.30) 0 18%, transparent 38%)}
+  .disc .label{position:absolute;inset:26%;border-radius:50%;background:var(--c);display:grid;place-items:center;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+  .disc .label::after{content:"";position:absolute;width:26%;height:26%;border-radius:50%;background:#0B0D10;box-shadow:0 0 0 4px rgba(255,255,255,.55)}
+
+  /* ホーム画面・タブ用のしるし */
+  #icon{width:512px;height:512px;display:grid;place-items:center;
+    background:radial-gradient(120% 120% at 50% 20%, #1B1E24, #0A0B0E 70%)}
+  #icon .disc{width:76.5%;height:76.5%}
+
+  /* リンクを送ったときのプレビュー */
+  #og{width:1200px;height:630px;padding:64px 72px;display:flex;flex-direction:column;justify-content:space-between;
+    background:
+      radial-gradient(90% 70% at 50% -10%, rgba(124,242,200,.09), transparent 60%),
+      radial-gradient(80% 60% at 50% 120%, rgba(226,80,58,.08), transparent 60%), #0C0D10}
+  #og h1{font-family:"Shippori Mincho",serif;font-size:76px;letter-spacing:.1em;margin:0 0 18px}
+  #og p{margin:0;font-size:26px;color:#948E82;letter-spacing:.06em}
+  #og .row{display:flex;gap:26px;align-items:flex-end}
+  #og .row .disc{width:126px;height:126px}
+  #og .foot{display:flex;align-items:baseline;gap:14px;font-family:'Barlow Semi Condensed',sans-serif;
+    font-size:15px;letter-spacing:.24em;text-transform:uppercase;color:#5E594F}
+  #og .foot .rule{flex:1;height:1px;background:rgba(232,227,217,.13)}
+</style>
+<div id="icon"><span class="disc" style="--c:#FFC46B"><span class="label"></span></span></div>
+<div id="og">
+  <div>
+    <h1>七枚の同じ歌</h1>
+    <p>おなじ歌詞を、七通りの旋律で。</p>
+  </div>
+  <div class="row">
+    <span class="disc" style="--c:#FFC46B"><span class="label"></span></span>
+    <span class="disc" style="--c:#7FB8FF"><span class="label"></span></span>
+    <span class="disc" style="--c:#C8F06B"><span class="label"></span></span>
+    <span class="disc" style="--c:#FF8FA8"><span class="label"></span></span>
+    <span class="disc" style="--c:#A98CFF"><span class="label"></span></span>
+    <span class="disc" style="--c:#7CF2C8"><span class="label"></span></span>
+    <span class="disc" style="--c:#FF7A4A"><span class="label"></span></span>
+  </div>
+  <div class="foot"><span>Compact Disc Player</span><span class="rule"></span><span>7 Discs, One Lyric</span></div>
+</div>

@@ -5,6 +5,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="同じ歌詞・違う旋律の七曲を、CDプレイヤーとブラウン管で贈るプレイヤー">
 <meta name="theme-color" content="#0C0D10">
+<link rel="icon" href="assets/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="七枚の同じ歌">
+<meta property="og:title" content="七枚の同じ歌">
+<meta property="og:description" content="おなじ歌詞を、七通りの旋律で。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://roguepink.github.io/cdtukuru/">
+<meta property="og:image" content="https://roguepink.github.io/cdtukuru/assets/og.png">
+<meta name="twitter:card" content="summary_large_image">
 <title>七枚の同じ歌</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -427,7 +439,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     </dl>
     <dl>
       <dt>ブラウン管の映像</dt>
-      <dd><code>visual</code> に画像か <code>.mp4</code> を指定すると、走査線・湾曲・にじみを乗せて再生。未指定の曲は曲ごとの自動生成映像になります。</dd>
+      <dd><code>assets/visuals/01.jpg</code> 〜 <code>07.jpg</code> を置くだけで、走査線・湾曲・にじみを乗せて映ります。置いていない曲は自動生成の映像のまま。動画にしたいときは <code>visual</code> を <code>.mp4</code> に。</dd>
     </dl>
     <dl>
       <dt>渡しかた</dt>
@@ -445,25 +457,25 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ---------- 1. 曲の設定（差し替えポイント） ---------- */
 const TRACKS = [
   { n:'01', title:'その一', tag:'TAKE 1', c:'#FFC46B', dur:254, scene:0,
-    src:'assets/audio/01.mp3', visual:null,
+    src:'assets/audio/01.mp3', visual:'assets/visuals/01.jpg',
     demo:{bpm:76,  root:60, minor:false, wave:'triangle', mel:[0,2,4,7,4,2,null,0, 4,5,7,9,7,4,2,null], prog:[0,5,3,4], dly:.34} },
   { n:'02', title:'その二', tag:'TAKE 2', c:'#7FB8FF', dur:234, scene:1,
-    src:'assets/audio/02.mp3', visual:null,
+    src:'assets/audio/02.mp3', visual:'assets/visuals/02.jpg',
     demo:{bpm:104, root:62, minor:false, wave:'sawtooth', mel:[7,null,7,9,11,9,7,4, 5,null,5,7,9,7,5,2], prog:[1,4,0,5], dly:.26} },
   { n:'03', title:'その三', tag:'TAKE 3', c:'#C8F06B', dur:238, scene:2,
-    src:'assets/audio/03.mp3', visual:null,
+    src:'assets/audio/03.mp3', visual:'assets/visuals/03.jpg',
     demo:{bpm:92,  root:57, minor:true,  wave:'sine',     mel:[4,5,7,null,9,7,5,4, 2,4,5,null,7,5,4,2], prog:[0,3,4,3], dly:.30} },
   { n:'04', title:'その四', tag:'TAKE 4', c:'#FF8FA8', dur:208, scene:3,
-    src:'assets/audio/04.mp3', visual:null,
+    src:'assets/audio/04.mp3', visual:'assets/visuals/04.jpg',
     demo:{bpm:66,  root:55, minor:false, wave:'triangle', mel:[0,null,4,null,7,null,9,null, 7,null,5,null,4,null,2,null], prog:[0,4,5,3], dly:.42} },
   { n:'05', title:'その五', tag:'TAKE 5', c:'#A98CFF', dur:241, scene:4,
-    src:'assets/audio/05.mp3', visual:null,
+    src:'assets/audio/05.mp3', visual:'assets/visuals/05.jpg',
     demo:{bpm:118, root:59, minor:true,  wave:'square',   mel:[0,0,7,0,5,0,4,0, 2,2,7,2,4,2,0,null], prog:[0,5,3,4], dly:.22} },
   { n:'06', title:'その六', tag:'TAKE 6', c:'#7CF2C8', dur:176, scene:5,
-    src:'assets/audio/06.mp3', visual:null,
+    src:'assets/audio/06.mp3', visual:'assets/visuals/06.jpg',
     demo:{bpm:84,  root:72, minor:false, wave:'sine',     mel:[7,9,11,9,7,4,null,2, 4,7,9,7,4,2,null,0], prog:[0,3,4,0], dly:.38} },
   { n:'07', title:'その七', tag:'TAKE 7', c:'#FF7A4A', dur:254, scene:6,
-    src:'assets/audio/07.mp3', visual:null,
+    src:'assets/audio/07.mp3', visual:'assets/visuals/07.jpg',
     demo:{bpm:72,  root:64, minor:false, wave:'triangle', mel:[0,2,4,null,5,4,2,0, 4,2,0,null,-3,0,2,null], prog:[0,4,3,5], dly:.36} },
 ];
 
@@ -830,11 +842,12 @@ const crt = (()=>{
   const BARS = ['#C8C8C8','#C8C800','#00C8C8','#00C800','#C800C8','#C80000','#0000C8'];
 
   function getMedia(t){
-    if(!t.visual) return null;
+    if(!t.visual || media[t.visual] === false) return null;   // false = 置かれていない
     if(media[t.visual]) return media[t.visual];
     let el;
     if(/\.(mp4|webm|mov)$/i.test(t.visual)){ el = document.createElement('video'); el.muted=true; el.loop=true; el.playsInline=true; el.src=t.visual; el.play().catch(()=>{}); }
     else { el = new Image(); el.src = t.visual; }
+    el.addEventListener('error', ()=>{ media[t.visual] = false; });
     media[t.visual] = el; return el;
   }
   function cover(el){

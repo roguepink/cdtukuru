@@ -30,7 +30,7 @@
 | `c` | その曲の色（ディスクのラベル、テレビの発光色、選択中の枠） |
 | `dur` | 尺（秒）。`src` を入れると実ファイルの長さで上書きされる |
 | `src` | mp3 / m4a / wav。`assets/audio/` に置くのがおすすめ |
-| `visual` | 画像か動画。未指定なら `scene`(0–6) の自動生成映像 |
+| `visual` | 既定は `assets/visuals/NN.jpg`。置けば映り、無ければ `scene`(0–6) の自動生成映像 |
 | `cues` | 任意。`[12.0, 18.4, ...]` と歌詞行の秒数を並べると手動同期になる |
 
 ### 2. 歌詞 — `LYRICS`
@@ -38,12 +38,23 @@
 七曲共通なので一度書くだけ。`''` は空行（連の区切り）。
 `cues` を書かない曲は、尺に合わせて自動で行送りします。
 
-## 渡しかた
+## 公開する（GitHub Pages）
 
-1. **GitHub Pages** — Settings → Pages → Branch: `main` / root。URL を送るだけ。スマホでもそのまま動く。
-2. **ZIP で手渡し** — フォルダごと渡して `index.html` を開いてもらう。オフラインでも動く（書体だけ既定に落ちる）。
+1. リポジトリを **Public** にする — Settings → General → 一番下の Danger Zone → Change visibility
+2. **Settings → Pages** → Source: *Deploy from a branch* → Branch: `claude/music-gift-app-design-b7blh5` / `/ (root)` → Save
+3. 数分待つと <https://roguepink.github.io/cdtukuru/> で開く
 
-音源は著作物です。自作曲・自作カバーの範囲で、公開範囲は限定リンクにとどめるのが安全です。
+公開したリポジトリは誰でも見られます。曲・歌詞ごと公開になる点は承知のうえで。
+オフラインで渡したいときは、フォルダごと ZIP にして `index.html` を開いてもらうだけでも動きます。
+
+### スマホのホーム画面に追加すると
+
+`manifest.webmanifest` と `assets/icon-*.png` を入れてあるので、iPhone / Android とも
+「ホーム画面に追加」でアイコンが付き、アドレスバーの無い全画面で開きます。
+リンクを送ったときのサムネイルは `assets/og.png`。公開先を変えたら `tools/build.py` の
+`SITE` を直して作り直してください（`python3 tools/build.py`）。
+
+アイコンとサムネイルの作り直しは `NODE_PATH=$(npm root -g) node tools/make-assets.js`（元は `tools/card.html`）。
 
 ## 構成
 
@@ -51,6 +62,8 @@
 index.html        配布用（tools/build.py が生成。直接編集しない）
 src/app.html      本体。HTML + CSS + JS が 1 枚に入っている
 tools/build.py    src/app.html を index.html に包む
-assets/audio/     mp3 を置く場所
-assets/visuals/   テレビに映す画像・動画を置く場所
+assets/audio/     01.mp3 〜 07.mp3（収録済み）
+assets/visuals/   01.jpg 〜 07.jpg を置くとテレビに映る
+assets/icon-*.png ホーム画面用アイコン / og.png リンクのサムネイル
+manifest.webmanifest, .nojekyll   公開用
 ```
