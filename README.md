@@ -41,7 +41,7 @@
 const GIFT = {
   to:   '',                            // 宛名。例: 'ゆうき と さき へ'。空なら出さない
   from: '',                            // 差出人。例: '同級生一同より'
-  idleVisual: 'assets/visuals/07.jpg', // 何も入っていないときテレビに映す絵
+  idleVisual: 'assets/visuals/gift.jpg', // 何も入っていないときテレビに映す絵
   endAfterLast: true,                  // 最後の曲のあと、最初に戻らず締める（false で繰り返し）
 };
 ```
@@ -88,6 +88,7 @@ src/app.html      本体。HTML + CSS + JS が 1 枚に入っている
 tools/build.py    src/app.html を index.html に包む
 assets/audio/     01.mp3 〜 07.mp3（収録済み）
 assets/visuals/   01.jpg 〜 07.jpg（収録済み。上書きすれば差し替わる）
+                  gift.jpg（待受画面の絵）
 assets/icon-*.png ホーム画面用アイコン / og.png リンクのサムネイル
 manifest.webmanifest, .nojekyll   公開用
 ```

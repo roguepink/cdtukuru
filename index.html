@@ -456,19 +456,19 @@ const TRACKS = [
     src:'assets/audio/01.mp3', visual:'assets/visuals/01.jpg',
     demo:{bpm:76,  root:60, minor:false, wave:'triangle', mel:[0,2,4,7,4,2,null,0, 4,5,7,9,7,4,2,null], prog:[0,5,3,4], dly:.34} },
   { n:'02', title:'Everyday', tag:'TAKE 2', c:'#7FB8FF', dur:234, scene:1,
-    src:'assets/audio/02.mp3', visual:'assets/visuals/02.jpg', fit:'cover', focus:.30,
+    src:'assets/audio/02.mp3', visual:'assets/visuals/02.jpg',
     demo:{bpm:104, root:62, minor:false, wave:'sawtooth', mel:[7,null,7,9,11,9,7,4, 5,null,5,7,9,7,5,2], prog:[1,4,0,5], dly:.26} },
   { n:'03', title:'Pure Love', tag:'TAKE 3', c:'#C8F06B', dur:238, scene:2,
-    src:'assets/audio/03.mp3', visual:'assets/visuals/03.jpg',
+    src:'assets/audio/03.mp3', visual:'assets/visuals/03.jpg', fit:'cover',
     demo:{bpm:92,  root:57, minor:true,  wave:'sine',     mel:[4,5,7,null,9,7,5,4, 2,4,5,null,7,5,4,2], prog:[0,3,4,3], dly:.30} },
   { n:'04', title:'時と奇跡', tag:'TAKE 4', c:'#FF8FA8', dur:208, scene:3,
-    src:'assets/audio/04.mp3', visual:'assets/visuals/04.jpg',
+    src:'assets/audio/04.mp3', visual:'assets/visuals/04.jpg', fit:'cover',
     demo:{bpm:66,  root:55, minor:false, wave:'triangle', mel:[0,null,4,null,7,null,9,null, 7,null,5,null,4,null,2,null], prog:[0,4,5,3], dly:.42} },
   { n:'05', title:'静かな季節', tag:'TAKE 5', c:'#A98CFF', dur:241, scene:4,
     src:'assets/audio/05.mp3', visual:'assets/visuals/05.jpg',
     demo:{bpm:118, root:59, minor:true,  wave:'square',   mel:[0,0,7,0,5,0,4,0, 2,2,7,2,4,2,0,null], prog:[0,5,3,4], dly:.22} },
   { n:'06', title:'旅立ち', tag:'TAKE 6', c:'#7CF2C8', dur:176, scene:5,
-    src:'assets/audio/06.mp3', visual:'assets/visuals/06.jpg',
+    src:'assets/audio/06.mp3', visual:'assets/visuals/06.jpg', fit:'cover',
     demo:{bpm:84,  root:72, minor:false, wave:'sine',     mel:[7,9,11,9,7,4,null,2, 4,7,9,7,4,2,null,0], prog:[0,3,4,0], dly:.38} },
   { n:'07', title:'New Story', tag:'TAKE 7', c:'#FF7A4A', dur:254, scene:6,
     src:'assets/audio/07.mp3', visual:'assets/visuals/07.jpg',
@@ -532,7 +532,7 @@ const LYRICS = [
 const GIFT = {
   to:   '',                            // 例: 'ゆうき と さき へ'。空なら出さない
   from: '',                            // 例: '同級生一同より'
-  idleVisual: 'assets/visuals/07.jpg', // 何も入っていないときテレビに映す絵
+  idleVisual: 'assets/visuals/gift.jpg', // 何も入っていないときテレビに映す絵
   endAfterLast: true,                  // 最後の曲のあと、最初に戻らず締める
 };
 
