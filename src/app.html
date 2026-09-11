@@ -1,4 +1,4 @@
-<title>七枚の同じ歌</title>
+<title>7つの扉</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700&family=DotGothic16&family=Shippori+Mincho:wght@500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
@@ -213,15 +213,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .meter i.on{background:var(--vfd); box-shadow:0 0 5px rgba(124,242,200,.8)}
 
 /* シークバー */
-.seek{position:relative; height:22px; display:flex; align-items:center; cursor:pointer; touch-action:none}
-.seek .track{position:relative; width:100%; height:5px; border-radius:3px; background:rgba(0,0,0,.42); box-shadow:0 1px 0 rgba(255,255,255,.22)}
+.seek{position:relative; height:34px; display:flex; align-items:center; cursor:pointer; touch-action:none}
+.seek .track{position:relative; width:100%; height:6px; border-radius:3px; background:rgba(0,0,0,.42); box-shadow:0 1px 0 rgba(255,255,255,.22)}
 .seek .fill{position:absolute; inset:0 auto 0 0; width:0%; border-radius:3px; background:linear-gradient(90deg,#3E7F6C,var(--vfd)); box-shadow:0 0 8px rgba(124,242,200,.5)}
-.seek .head{position:absolute; top:50%; left:0; width:11px; height:11px; margin:-5.5px 0 0 -5.5px; border-radius:50%; background:#EFE9DA; box-shadow:0 1px 3px rgba(0,0,0,.7)}
+.seek .head{position:absolute; top:50%; left:0; width:15px; height:15px; margin:-7.5px 0 0 -7.5px; border-radius:50%; background:#EFE9DA; box-shadow:0 1px 3px rgba(0,0,0,.7)}
 
 /* トランスポート */
-.transport{display:flex; flex-wrap:wrap; gap:7px; align-items:center}
+.transport{display:flex; flex-wrap:wrap; gap:9px; align-items:center}
 .tb{
-  min-width:46px; height:34px; padding:0 10px; border-radius:var(--r-sm);
+  min-width:58px; height:46px; padding:0 14px; border-radius:var(--r-sm);
   display:inline-grid; place-items:center;
   background:linear-gradient(180deg,#3A3D44,#22252B 62%,#16181D);
   box-shadow:0 1px 0 rgba(255,255,255,.22) inset, 0 -2px 3px rgba(0,0,0,.5) inset, 0 3px 5px -2px rgba(0,0,0,.6);
@@ -229,9 +229,11 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 }
 .tb:hover{background:linear-gradient(180deg,#454951,#272B32 62%,#191C21)}
 .tb:active{transform:translateY(1px); box-shadow:0 2px 5px rgba(0,0,0,.6) inset}
-.tb svg{width:15px; height:15px; fill:currentColor; display:block}
-.tb.play{min-width:62px; color:#0B1310; background:linear-gradient(180deg,#9BF6D6,#59C8A6 60%,#3E9B80)}
+.tb svg{width:18px; height:18px; fill:currentColor; display:block}
+.tb.play{min-width:84px; color:#0B1310; background:linear-gradient(180deg,#9BF6D6,#59C8A6 60%,#3E9B80)}
 .tb.play:hover{background:linear-gradient(180deg,#B4FFE4,#6BD8B5 60%,#43A487)}
+.tb.play svg{width:21px; height:21px}
+#btnEject{margin-left:10px}
 .tb[disabled]{opacity:.38; cursor:not-allowed; transform:none}
 .tb.play.attn{animation:attn 1.15s ease-in-out infinite}
 @keyframes attn{
@@ -240,7 +242,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 }
 @media (prefers-reduced-motion:reduce){ .tb.play.attn{animation:none; box-shadow:0 0 0 4px rgba(155,246,214,.45)} }
 .vol{display:flex; align-items:center; gap:8px; margin-left:auto; color:#3E3931}
-.vol input{width:88px; accent-color:#3E7F6C}
+.vol input{width:104px; height:26px; accent-color:#3E7F6C}
 .vol .silk{color:#3E3931}
 
 /* ---------- ディスクラック ---------- */
@@ -302,10 +304,16 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   .chamber{max-width:190px; margin-inline:auto}
 }
 @media (max-width:430px){
-  /* 操作ボタンは折り返さず一列に収める */
-  .transport{gap:6px; flex-wrap:nowrap}
-  .tb{min-width:0; flex:1; padding:0 6px; height:42px}   /* 指で押しやすい高さに */
-  .tb.play{min-width:0; flex:1.4}
+  /* 狭い画面では、いちばん押す再生ボタンを一段目いっぱいに。
+     残り五つを二段目に並べると、指の的が横 45px 以上とれる。 */
+  .transport{display:grid; grid-template-columns:repeat(5,1fr); gap:6px}
+  .tb{min-width:0; height:50px; padding:0}
+  .tb.play{order:-1; grid-column:1/-1; height:58px}
+  .tb svg{width:21px; height:21px}
+  .tb.play svg{width:24px; height:24px}
+  .vol{grid-column:1/-1; margin-left:0}
+  #btnEject{margin-left:0}
+  .seek{height:40px}
   .tv{grid-template-columns:minmax(0,1fr); }
   .tv-side{flex-direction:row; align-items:center; justify-content:space-between}
   .grille{width:auto; flex:1; height:26px; background:repeating-linear-gradient(90deg,#8C8368 0 2px, rgba(0,0,0,.42) 2px 5px)}
@@ -320,7 +328,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <div class="room">
   <header class="masthead">
     <div>
-      <h1>七枚の同じ歌</h1>
+      <h1>7つの扉</h1>
       <p class="sub">おなじ歌詞を、七通りの旋律で。ディスクを選んで、デッキに入れてください。</p>
     </div>
   </header>
@@ -385,7 +393,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
           <button class="tb" id="btnFf" title="早送り（長押しで早送り）" aria-label="早送り"><svg viewBox="0 0 24 24"><path d="M2 5l9.5 7L2 19zM12.5 5L22 12l-9.5 7z"/></svg></button>
           <button class="tb" id="btnNext" title="次の曲" aria-label="次の曲"><svg viewBox="0 0 24 24"><path d="M15.5 5H18v14h-2.5zM4 5l10.5 7L4 19z"/></svg></button>
           <button class="tb" id="btnEject" title="ディスクを取り出す" aria-label="取り出し"><svg viewBox="0 0 24 24"><path d="M12 4l8 10H4zM4 17h16v3H4z"/></svg></button>
-          <span class="vol"><span class="silk">Vol</span><input id="vol" type="range" min="0" max="100" value="62" aria-label="音量"></span>
+          <span class="vol"><span class="silk">Vol</span><input id="vol" type="range" min="0" max="100" value="100" aria-label="音量"></span>
         </div>
       </div>
     </section>
@@ -512,11 +520,12 @@ const deg = (d,minor) => { const sc = minor?MINOR:MAJOR; const o=Math.floor(d/7)
 const hz = m => 440*Math.pow(2,(m-69)/12);
 
 /* ---------- 4. 音まわり ---------- */
-let AC=null, master=null, analyser=null, delayWet=null, freqData=null, waveData=null, elSrc=null;
+let AC=null, master=null, mediaGain=null, analyser=null, delayWet=null, freqData=null, waveData=null, elSrc=null;
 function initAudio(){
   if(AC) return;
   AC = new (window.AudioContext||window.webkitAudioContext)();
-  master = AC.createGain(); master.gain.value = volOf();
+  master = AC.createGain(); master.gain.value = volOf();          // 仮のデモ音用（残響あり）
+  mediaGain = AC.createGain(); mediaGain.gain.value = volOf();   // 音源用（何も足さない）
   analyser = AC.createAnalyser(); analyser.fftSize = 512; analyser.smoothingTimeConstant = .8;
   freqData = new Uint8Array(analyser.frequencyBinCount);
   waveData = new Uint8Array(analyser.fftSize);
@@ -524,10 +533,11 @@ function initAudio(){
   const fb = AC.createGain(); fb.gain.value=.28;
   delayWet = AC.createGain(); delayWet.gain.value=.2;
   dl.connect(fb); fb.connect(dl); dl.connect(delayWet); delayWet.connect(master);
-  master.connect(analyser); analyser.connect(AC.destination);
+  master.connect(analyser); mediaGain.connect(analyser); analyser.connect(AC.destination);
   audio.delay = dl;
 }
-function volOf(){ return Math.pow(($('#vol').value||62)/100, 1.6) * .9; }
+// 既定（つまみ最大）で 1.0＝素の音量。絞ったぶんだけ小さくなる
+function volOf(){ return Math.pow(($('#vol').value || 100)/100, 1.7); }
 
 /* iPhone / iPad かどうか。iOS には次の制約があるため分岐が要る。
    ・音声要素は「指で触れたその拍」で play() しないと鳴らない
@@ -599,7 +609,7 @@ const audio = {
     if(!this.t) return;
     this.playing = true;
     if(this.mode === 'file'){
-      if(!IOS){ initAudio(); if(AC.state === 'suspended') AC.resume(); master.gain.value = volOf(); }
+      if(!IOS){ initAudio(); if(AC.state === 'suspended') AC.resume(); mediaGain.gain.value = volOf(); }
       const el = this.el, track = this.t;
       if(el.readyState > 0 && Math.abs(el.currentTime - this.pos) > .3){
         try{ el.currentTime = this.pos; }catch(e){}
@@ -621,7 +631,7 @@ const audio = {
           if(this.tapped || AC.state !== 'running') return;
           try{
             elSrc = AC.createMediaElementSource(el);
-            elSrc.connect(master); elSrc.connect(this.delay); this.tapped = true;
+            elSrc.connect(mediaGain); this.tapped = true;   // 残響には通さない
           }catch(e){}
         });
       }
@@ -1027,7 +1037,11 @@ function wire(){
   $('#btnPrev').addEventListener('click', ()=> ui.skip(-1));
   $('#btnNext').addEventListener('click', ()=> ui.skip(1));
   $('#btnEject').addEventListener('click', ()=> ui.eject());
-  $('#vol').addEventListener('input', ()=>{ if(master) master.gain.value = volOf(); });
+  $('#vol').addEventListener('input', ()=>{
+    const v = volOf();
+    if(master) master.gain.value = v;
+    if(mediaGain) mediaGain.gain.value = v;
+  });
 
   // 早送り・巻き戻し：押しっぱなしで走る、単押しで10秒
   [['#btnFf',1],['#btnRew',-1]].forEach(([sel,dir])=>{

@@ -1,6 +1,6 @@
 {
-  "name": "七枚の同じ歌",
-  "short_name": "七枚の同じ歌",
+  "name": "7つの扉",
+  "short_name": "7つの扉",
   "description": "おなじ歌詞を、七通りの旋律で。",
   "start_url": ".",
   "scope": ".",
@@ -9,7 +9,16 @@
   "background_color": "#0C0D10",
   "theme_color": "#0C0D10",
   "icons": [
-    { "src": "assets/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "assets/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
   ]
 }
