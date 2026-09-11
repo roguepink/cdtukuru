@@ -42,9 +42,14 @@
 
 ## 公開する（GitHub Pages）
 
-1. リポジトリを **Public** にする — Settings → General → 一番下の Danger Zone → Change visibility
-2. **Settings → Pages** → Source: *Deploy from a branch* → Branch: `claude/music-gift-app-design-b7blh5` / `/ (root)` → Save
-3. 数分待つと <https://roguepink.github.io/cdtukuru/> で開く
+`.github/workflows/deploy.yml` が入っているので、**push するたびに自動で公開されます**。
+初回の実行が Pages 自体も有効にするため、設定画面を触る必要はありません。
+
+公開先: <https://roguepink.github.io/cdtukuru/>
+
+うまく動かないときは Actions タブで `Deploy to GitHub Pages` の実行結果を見てください。
+手動で有効にする場合は Settings → Pages → Source: *Deploy from a branch* →
+Branch: `claude/music-gift-app-design-b7blh5` / `/ (root)` → Save。
 
 公開したリポジトリは誰でも見られます。曲・歌詞ごと公開になる点は承知のうえで。
 オフラインで渡したいときは、フォルダごと ZIP にして `index.html` を開いてもらうだけでも動きます。

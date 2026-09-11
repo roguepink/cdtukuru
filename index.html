@@ -65,22 +65,17 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 /* ---------- 部屋 ---------- */
 .room{
   max-width:1080px; margin-inline:auto;
-  padding-inline:18px; padding-block:26px 56px;
+  padding-inline:18px; padding-block:26px 48px;
   display:grid; gap:26px;
   grid-template-columns:minmax(0,1fr) 320px;
   align-items:start;
 }
-.masthead{grid-column:1/-1; display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px 20px; border-bottom:1px solid var(--hair); padding-bottom:16px}
+.masthead{grid-column:1/-1; display:flex; flex-wrap:wrap; align-items:flex-end; gap:10px 20px; border-bottom:1px solid var(--hair); padding-bottom:16px}
 .masthead h1{
   font-family:var(--serif); font-weight:600; font-size:clamp(23px,3.4vw,32px);
   margin:0; letter-spacing:.08em; text-wrap:balance;
 }
 .masthead .sub{margin:0; color:var(--ink-dim); font-size:13px; max-width:46ch}
-.stamp{
-  margin-left:auto; font-family:var(--label); font-weight:600; font-size:11px;
-  letter-spacing:.22em; text-transform:uppercase; color:var(--signal);
-  border:1px solid rgba(226,80,58,.45); border-radius:2px; padding:3px 9px; white-space:nowrap;
-}
 .stack{display:grid; gap:20px; min-width:0}
 
 /* ---------- 共通：機材の面 ---------- */
@@ -305,13 +300,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 }
 .bk-foot{margin-top:14px; padding-top:11px; border-top:1px solid rgba(30,27,21,.18); font-size:11.5px; color:#6A6152; line-height:1.65}
 
-/* ---------- 仕様メモ ---------- */
-.spec{grid-column:1/-1; display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(216px,1fr)); border-top:1px solid var(--hair); padding-top:20px}
-.spec h2{grid-column:1/-1; font-family:var(--label); font-weight:600; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--ink-dim); margin:0}
-.spec dl{margin:0; display:grid; gap:3px; align-content:start}
-.spec dt{font-family:var(--label); font-weight:600; font-size:10.5px; letter-spacing:.16em; text-transform:uppercase; color:var(--vfd)}
-.spec dd{margin:0; font-size:12.5px; color:var(--ink-dim); line-height:1.7}
-.spec code{font-family:var(--pixel); font-size:12px; color:var(--ink); background:rgba(255,255,255,.05); padding:0 4px; border-radius:2px}
 
 @media (max-width:900px){
   .room{grid-template-columns:minmax(0,1fr)}
@@ -338,7 +326,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <h1>七枚の同じ歌</h1>
       <p class="sub">おなじ歌詞を、七通りの旋律で。ディスクを選んで、デッキに入れてください。</p>
     </div>
-    <span class="stamp" id="stamp">試作 v0.2 / 音源あり</span>
   </header>
 
   <div class="stack">
@@ -427,25 +414,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <p class="bk-foot">七枚とも歌詞は同じ。旋律だけが変わります。<br>行の送りは尺に合わせた自動送りです（秒単位で合わせることもできます）。</p>
   </aside>
 
-  <section class="spec">
-    <h2>差し替えの手順 — Handover</h2>
-    <dl>
-      <dt>音源</dt>
-      <dd>七曲とも <code>assets/audio/01.mp3</code> 〜 <code>07.mp3</code> として収録済み。差し替えは同じ名前で上書きするだけ。読み込めない環境では仮のデモ音に自動で切り替わります。</dd>
-    </dl>
-    <dl>
-      <dt>歌詞</dt>
-      <dd>七曲共通なので <code>LYRICS</code> に一度書くだけ。<code>[Chorus]</code> のような角括弧はセクション見出しに、<code>""</code> は空行になります。行送りは自動、<code>cues</code> に秒数を並べれば手動同期。</dd>
-    </dl>
-    <dl>
-      <dt>ブラウン管の映像</dt>
-      <dd><code>assets/visuals/01.jpg</code> 〜 <code>07.jpg</code> を置くだけで、走査線・湾曲・にじみを乗せて映ります。置いていない曲は自動生成の映像のまま。動画にしたいときは <code>visual</code> を <code>.mp4</code> に。</dd>
-    </dl>
-    <dl>
-      <dt>渡しかた</dt>
-      <dd>GitHub Pages に置いてURLを送るのが一番かんたん。オフラインで渡すならZIPごと。曲名・色・尺も <code>TRACKS</code> の一箇所で変更できます。</dd>
-    </dl>
-  </section>
 </div>
 
 <script>
@@ -781,10 +749,8 @@ const ui = {
   },
 
   stamp(real){
-    const el = $('#stamp');
-    el.textContent = real ? '試作 v0.2 / 音源あり' : '試作 v0.2 / 音は仮';
-    el.style.color = real ? 'var(--vfd)' : 'var(--signal)';
-    el.style.borderColor = real ? 'rgba(124,242,200,.45)' : 'rgba(226,80,58,.45)';
+    const el = $('#stamp');                       // 制作中だけ置く印。本番の画面には無い
+    if(el){ el.textContent = real ? '音源あり' : '音は仮'; }
   },
 
   setLine(i){
