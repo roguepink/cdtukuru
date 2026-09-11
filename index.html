@@ -123,7 +123,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .screen .glass{
   position:absolute; inset:0; pointer-events:none;
   background:
-    repeating-linear-gradient(0deg, rgba(0,0,0,.34) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(0deg, rgba(0,0,0,.22) 0 1px, transparent 1px 3px),
     radial-gradient(120% 100% at 50% 50%, transparent 52%, rgba(0,0,0,.72) 100%),
     linear-gradient(107deg, rgba(255,255,255,.11) 0 24%, transparent 46%);
 }
@@ -460,7 +460,7 @@ const TRACKS = [
     src:'assets/audio/01.mp3', visual:'assets/visuals/01.jpg',
     demo:{bpm:76,  root:60, minor:false, wave:'triangle', mel:[0,2,4,7,4,2,null,0, 4,5,7,9,7,4,2,null], prog:[0,5,3,4], dly:.34} },
   { n:'02', title:'その二', tag:'TAKE 2', c:'#7FB8FF', dur:234, scene:1,
-    src:'assets/audio/02.mp3', visual:'assets/visuals/02.jpg',
+    src:'assets/audio/02.mp3', visual:'assets/visuals/02.jpg', fit:'cover', focus:.30,
     demo:{bpm:104, root:62, minor:false, wave:'sawtooth', mel:[7,null,7,9,11,9,7,4, 5,null,5,7,9,7,5,2], prog:[1,4,0,5], dly:.26} },
   { n:'03', title:'その三', tag:'TAKE 3', c:'#C8F06B', dur:238, scene:2,
     src:'assets/audio/03.mp3', visual:'assets/visuals/03.jpg',
@@ -850,11 +850,15 @@ const crt = (()=>{
     el.addEventListener('error', ()=>{ media[t.visual] = false; });
     media[t.visual] = el; return el;
   }
-  function cover(el){
+  // fit:'contain'（既定）は全体を収め、余りは黒帯に。'cover' は画面を埋めて切り取る。
+  // focus は縦の寄せ（0=上 / .5=中央 / 1=下）。
+  function fit(el, mode, focus){
     const w = el.videoWidth||el.naturalWidth, h = el.videoHeight||el.naturalHeight;
     if(!w||!h) return;
-    const s = Math.max(W/w, H/h), dw = w*s, dh = h*s;
-    g.drawImage(el, (W-dw)/2, (H-dh)/2, dw, dh);
+    const s = mode === 'cover' ? Math.max(W/w, H/h) : Math.min(W/w, H/h);
+    const dw = w*s, dh = h*s, dx = (W-dw)/2, dy = (H-dh)*(focus == null ? .5 : focus);
+    g.drawImage(el, dx, dy, dw, dh);
+    return { x:Math.max(0,dx), y:Math.max(0,dy), w:Math.min(W,dw), h:Math.min(H,dh) };
   }
   function bars(){
     g.globalAlpha = 1;
@@ -885,8 +889,10 @@ const crt = (()=>{
 
     const el = getMedia(track);
     if(el && (el.complete || el.readyState>=2)){
-      g.shadowBlur=0; g.globalAlpha=.92; cover(el);
-      g.globalAlpha=.16; g.fillStyle=col; g.fillRect(0,0,W,H); g.globalAlpha=1;
+      g.shadowBlur=0; g.globalAlpha=1;
+      g.fillStyle='#05070A'; g.fillRect(0,0,W,H);          // 黒帯に前の絵を残さない
+      const r = fit(el, track.fit, track.focus);
+      if(r){ g.globalAlpha=.07; g.fillStyle=col; g.fillRect(r.x, r.y, r.w, r.h); g.globalAlpha=1; }
     } else switch(track.scene){
       case 0: { // 波形
         g.beginPath();

@@ -31,6 +31,8 @@
 | `dur` | 尺（秒）。`src` を入れると実ファイルの長さで上書きされる |
 | `src` | mp3 / m4a / wav。`assets/audio/` に置くのがおすすめ |
 | `visual` | 既定は `assets/visuals/NN.jpg`。置けば映り、無ければ `scene`(0–6) の自動生成映像 |
+| `fit` | `contain`（既定・全体を収めて余りは黒帯）か `cover`（画面を埋めて切り取る） |
+| `focus` | `cover` のときの縦の寄せ。`0`=上 / `.5`=中央（既定）/ `1`=下 |
 | `cues` | 任意。`[12.0, 18.4, ...]` と歌詞行の秒数を並べると手動同期になる |
 
 ### 2. 歌詞 — `LYRICS`
@@ -63,7 +65,7 @@ index.html        配布用（tools/build.py が生成。直接編集しない�
 src/app.html      本体。HTML + CSS + JS が 1 枚に入っている
 tools/build.py    src/app.html を index.html に包む
 assets/audio/     01.mp3 〜 07.mp3（収録済み）
-assets/visuals/   01.jpg 〜 07.jpg を置くとテレビに映る
+assets/visuals/   01.jpg 〜 07.jpg（収録済み。上書きすれば差し替わる）
 assets/icon-*.png ホーム画面用アイコン / og.png リンクのサムネイル
 manifest.webmanifest, .nojekyll   公開用
 ```
