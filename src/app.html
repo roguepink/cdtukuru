@@ -793,7 +793,12 @@ const ui = {
 
   select(i, btn){
     if(!IOS){ initAudio(); if(AC.state==='suspended') AC.resume(); }
-    if(this.index === i){ this.toggle(); return; }
+    if(this.index === i){
+      // 入れた直後の二度目のタップ（二回タップの癖）で止まってしまわないように
+      if(performance.now() - (this.insertedAt || 0) < 600) return;
+      this.toggle(); return;
+    }
+    this.insertedAt = performance.now();
     const wasLoaded = this.loaded;
     this.index = i; const t = TRACKS[i];
     document.querySelectorAll('.slot').forEach((s,j)=> s.setAttribute('aria-current', j===i ? 'true':'false'));
@@ -866,6 +871,7 @@ const ui = {
     if(!this.loaded) return;
     this.cancelFlight();
     audio.pause(); audio.pos = 0;
+    audio.t = null; audio.dur = 0;      // 表示（シークバー・合計時間）も空に戻す
     crt.flash(300);
     const d = $('#chamber .disc');
     if(d){ d.style.transition='transform .4s ease, opacity .4s ease'; d.style.transform='translateY(-24px) scale(.8)'; d.style.opacity='0'; setTimeout(()=>d.remove(), 400); }
@@ -970,7 +976,7 @@ const ui = {
     if(now - (this._bufAt || 0) > 500){        // 読み込み済みの範囲は0.5秒ごと
       this._bufAt = now;
       let b = 0;
-      if(audio.mode === 'file' && audio.el && audio.el.buffered.length) b = audio.el.buffered.end(audio.el.buffered.length-1) / dur * 100;
+      if(this.loaded && audio.mode === 'file' && audio.el && audio.el.buffered.length) b = audio.el.buffered.end(audio.el.buffered.length-1) / dur * 100;
       $('#seekBuf').style.width = clamp(b, 0, 100) + '%';
     }
     const tt = mmss(this.loaded ? pos : 0);
@@ -1233,13 +1239,18 @@ function wire(){
       scrubbing = false;
       hold = setTimeout(()=>{ scrubbing = true; run = setInterval(()=> audio.seek(audio.position() + dir*.6), 55); }, 300);
     };
-    const end = () => {
-      clearTimeout(hold); clearInterval(run); run=null;
-      if(!scrubbing && !b.disabled) audio.seek(audio.position() + dir*10);
+    // 離したら止める。tap=true（指を離した）なら単押し扱いで10秒。
+    // 指がボタンの外へ出た・画面のスクロールに取られた場合は、飛ばさずに止めるだけ。
+    // 予約（hold）は必ず空にする。残したままだと、次の pointerleave でもう一度10秒飛ぶ。
+    const end = tap => {
+      const wasHeld = hold || run;
+      clearTimeout(hold); clearInterval(run); hold=null; run=null;
+      if(wasHeld && tap && !scrubbing && !b.disabled) audio.seek(audio.position() + dir*10);
       scrubbing = false;
     };
     b.addEventListener('pointerdown', start);
-    ['pointerup','pointerleave','pointercancel'].forEach(ev=> b.addEventListener(ev, ()=>{ if(hold||run) end(); }));
+    b.addEventListener('pointerup', ()=> end(true));
+    ['pointerleave','pointercancel'].forEach(ev=> b.addEventListener(ev, ()=> end(false)));
   });
 
   // シーク
