@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="同じ歌詞・違う旋律の七曲を、CDプレイヤーとブラウン管で贈るプレイヤー">
+<meta name="description" content="同じ歌詞・違う旋律の九曲を、CDプレイヤーとブラウン管で贈るプレイヤー">
 <meta name="theme-color" content="#0C0D10">
 <link rel="icon" href="assets/icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="シングルCD">
 <meta property="og:title" content="シングルCD">
-<meta property="og:description" content="おなじ歌詞に、七つのメロディをつけました。">
+<meta property="og:description" content="おなじ歌詞に、九つのメロディをつけました。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://roguepink.github.io/cdtukuru/">
 <meta property="og:image" content="https://roguepink.github.io/cdtukuru/assets/og.png">
@@ -279,6 +279,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .rack-head .silk{color:var(--ink-dim)}
 .rack-head .rule{flex:1; height:1px; background:var(--hair)}
 .shelf{display:grid; gap:8px; grid-template-columns:repeat(auto-fill,minmax(88px,1fr))}
+/* 広い画面：七枚までは一列、それより多ければ二段に分けて、名前が折り返さない幅を保つ */
+@media (min-width:901px){ .shelf{grid-template-columns:repeat(var(--cols,7),minmax(0,1fr))} }
 .slot{
   display:grid; gap:8px; justify-items:center; padding:9px 7px 10px; border-radius:var(--r-sm);
   background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
@@ -286,7 +288,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   transition:transform .18s ease, border-color .18s ease, background .18s ease;
 }
 .slot:hover{transform:translateY(-4px); border-color:rgba(255,255,255,.16); background:linear-gradient(180deg,rgba(255,255,255,.085),rgba(255,255,255,.02))}
-.slot .disc{width:70px; height:70px; transition:transform .18s ease}
+.slot .disc{width:100%; max-width:70px; aspect-ratio:1; height:auto; transition:transform .18s ease}
 .slot:hover .disc{transform:rotate(-8deg)}
 .slot:active{transform:translateY(0) scale(.97)}
 .slot .nm{font-family:var(--body); font-size:12px; line-height:1.35; color:var(--ink)}
@@ -353,7 +355,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <div>
       <p class="to" id="dedication" hidden></p>
       <h1>シングルCD</h1>
-      <p class="sub"><span>おなじ歌詞に、七つのメロディをつけました。</span> <span>すきなディスクをえらぶと、デッキに入って流れます。</span></p>
+      <p class="sub"><span>おなじ歌詞に、九つのメロディをつけました。</span> <span>すきなディスクをえらぶと、デッキに入って流れます。</span></p>
     </div>
   </header>
 
@@ -437,7 +439,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <aside class="booklet" aria-label="歌詞カード">
     <div class="bk-head">
       <span class="silk">Lyrics</span>
-      <span class="tag">七曲共通</span>
+      <span class="tag">九曲共通</span>
     </div>
     <div class="lyrics" id="lyrics"></div>
   </aside>
@@ -473,6 +475,12 @@ const TRACKS = [
   { n:'07', title:'New Story', tag:'TAKE 7', c:'#FF7A4A', dur:254, scene:6,
     src:'assets/audio/07.mp3', visual:'assets/visuals/07.jpg',
     demo:{bpm:72,  root:64, minor:false, wave:'triangle', mel:[0,2,4,null,5,4,2,0, 4,2,0,null,-3,0,2,null], prog:[0,4,3,5], dly:.36} },
+  { n:'08', title:'青いチャイム', tag:'TAKE 8', c:'#62D9E8', dur:253, scene:7,
+    src:'assets/audio/08.mp3', visual:'assets/visuals/08.jpg', fit:'cover', focus:.22,
+    demo:{bpm:96,  root:62, minor:false, wave:'triangle', mel:[4,7,9,7,4,2,null,4, 5,7,9,11,9,7,null,4], prog:[0,3,4,0], dly:.30} },
+  { n:'09', title:'青いチャイム Ⅱ', tag:'TAKE 9', c:'#9BB0FF', dur:262, scene:8,
+    src:'assets/audio/09.mp3', visual:'assets/visuals/09.jpg',
+    demo:{bpm:88,  root:60, minor:false, wave:'sine',     mel:[0,4,7,null,9,7,4,0, 2,5,7,null,9,7,5,2], prog:[0,5,3,4], dly:.34} },
 ];
 
 /* ---------- 2. 歌詞（七曲共通・差し替えポイント） ---------- */
@@ -758,6 +766,7 @@ const ui = {
 
   build(){
     const shelf = $('#shelf');
+    shelf.style.setProperty('--cols', TRACKS.length <= 7 ? TRACKS.length : Math.ceil(TRACKS.length/2));
     TRACKS.forEach((t,i)=>{
       const b = document.createElement('button');
       b.className='slot'; b.type='button'; b.style.setProperty('--c', t.c);
@@ -889,7 +898,7 @@ const ui = {
     if(GIFT.endAfterLast && this.index === TRACKS.length - 1){ this.finish(); return; }
     this.skip(1);
   },
-  /* 七枚目が終わったら、最初に戻らず締める。ディスクを選べばまた始まる */
+  /* 最後の一枚が終わったら、最初に戻らず締める。ディスクを選べばまた始まる */
   finish(){
     this.eject();
     crt.flash(420);
@@ -903,7 +912,7 @@ const ui = {
     $('#btnPlay').setAttribute('aria-label', playing ? '一時停止' : '再生');
     $('#vfdMode').textContent = !this.loaded ? '■ STOP' : playing ? '▶ PLAY' : '❚❚ PAUSE';
     $('#vfdTrack').textContent = t ? 'TRACK '+t.n : 'TRACK --';
-    $('#vfdRepeat').textContent = GIFT.endAfterLast ? 'OF 07' : 'ALL';
+    $('#vfdRepeat').textContent = GIFT.endAfterLast ? 'OF ' + String(TRACKS.length).padStart(2,'0') : 'ALL';
     // 曲名が入ったので TAKE n は出さない。曲番号は左の TRACK 表示にある。
     if(!this.msg) $('#vfdTitle').textContent = t ? t.title : 'ディスクを えらんでください';
     $('#vfdTotal').textContent = mmss(audio.dur || 0);
@@ -1039,7 +1048,7 @@ const crt = (()=>{
     g.fillStyle = '#0B0F12'; g.fillRect(0, H*.72, W, H*.28);
     g.fillStyle = '#8FA0A8'; g.font = '22px DotGothic16, monospace'; g.textAlign = 'left';
     g.fillText('NO DISC', 26, H*.72+52);
-    g.textAlign = 'right'; g.fillText('SELECT 01–07', W-26, H*.72+52);
+    g.textAlign = 'right'; g.fillText('SELECT 01–' + String(TRACKS.length).padStart(2,'0'), W-26, H*.72+52);
     g.textAlign = 'left';
   }
   /* 何も入っていないとき。贈り物の顔になる絵を映す */
@@ -1265,7 +1274,7 @@ function wire(){
     if(e.code==='Space'){ e.preventDefault(); if(!IOS){ initAudio(); if(AC.state==='suspended') AC.resume(); } ui.toggle(); }
     if(e.key==='ArrowRight' && e.shiftKey) ui.skip(1);
     if(e.key==='ArrowLeft' && e.shiftKey) ui.skip(-1);
-    if(/^[1-7]$/.test(e.key)){ const i=+e.key-1; ui.select(i, document.querySelectorAll('.slot')[i]); }
+    if(/^[1-9]$/.test(e.key)){ const i=+e.key-1; if(i < TRACKS.length) ui.select(i, document.querySelectorAll('.slot')[i]); }
   });
 }
 
