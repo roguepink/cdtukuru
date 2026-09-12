@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="description" content="同じ歌詞・違う旋律の九曲を、CDプレイヤーとブラウン管で贈るプレイヤー">
+<meta name="description" content="同じ歌詞・違う旋律の十一曲を、CDプレイヤーとブラウン管で贈るプレイヤー">
 <meta name="theme-color" content="#0C0D10">
 <link rel="icon" href="assets/icon-192.png" sizes="192x192">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
@@ -12,7 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="シングルCD">
 <meta property="og:title" content="シングルCD">
-<meta property="og:description" content="おなじ歌詞に、九つのメロディをつけました。">
+<meta property="og:description" content="おなじ歌詞に、十一のメロディをつけました。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://roguepink.github.io/cdtukuru/">
 <meta property="og:image" content="https://roguepink.github.io/cdtukuru/assets/og.png">
@@ -355,7 +355,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <div>
       <p class="to" id="dedication" hidden></p>
       <h1>シングルCD</h1>
-      <p class="sub"><span>おなじ歌詞に、九つのメロディをつけました。</span> <span>すきなディスクをえらぶと、デッキに入って流れます。</span></p>
+      <p class="sub"><span>おなじ歌詞に、十一のメロディをつけました。</span> <span>すきなディスクをえらぶと、デッキに入って流れます。</span></p>
     </div>
   </header>
 
@@ -439,7 +439,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <aside class="booklet" aria-label="歌詞カード">
     <div class="bk-head">
       <span class="silk">Lyrics</span>
-      <span class="tag">九曲共通</span>
+      <span class="tag">全曲共通</span>
     </div>
     <div class="lyrics" id="lyrics"></div>
   </aside>
@@ -481,6 +481,12 @@ const TRACKS = [
   { n:'09', title:'ボサノバ', tag:'TAKE 9', c:'#9BB0FF', dur:262, scene:8,
     src:'assets/audio/09.mp3', visual:'assets/visuals/09.jpg',
     demo:{bpm:88,  root:60, minor:false, wave:'sine',     mel:[0,4,7,null,9,7,4,0, 2,5,7,null,9,7,5,2], prog:[0,5,3,4], dly:.34} },
+  { n:'10', title:'ボサノバ 女性', tag:'TAKE 10', c:'#F6D365', dur:293, scene:9,
+    src:'assets/audio/10.mp3', visual:'assets/visuals/10.jpg', fit:'cover', focus:.22,
+    demo:{bpm:92,  root:65, minor:false, wave:'sine',     mel:[7,9,7,4,null,5,7,9, 11,9,7,null,4,5,7,null], prog:[0,3,1,4], dly:.32} },
+  { n:'11', title:'Jレゲエ', tag:'TAKE 11', c:'#3FCF7F', dur:293, scene:10,
+    src:'assets/audio/11.mp3', visual:'assets/visuals/11.jpg', fit:'cover', focus:.22,
+    demo:{bpm:80,  root:57, minor:false, wave:'square',   mel:[null,0,null,0,null,4,null,4, null,5,null,5,null,7,null,2], prog:[0,4,5,3], dly:.28} },
 ];
 
 /* ---------- 2. 歌詞（七曲共通・差し替えポイント） ---------- */
